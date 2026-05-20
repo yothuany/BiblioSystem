@@ -9,7 +9,6 @@ namespace BiblioSystem.Controllers;
 [Route("api/[controller]")]
 public class UsuarioController(UsuarioService service) : ControllerBase
 {
-    // RF11 - Autenticação de usuários
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
@@ -23,9 +22,9 @@ public class UsuarioController(UsuarioService service) : ControllerBase
         try
         {
             var usuario = await service.CreateAsync(dto);
-            return Created(string.Empty, new { usuario.IdUsuario, usuario.Email });
+            return base.Created(string.Empty, new { usuario.IdUsuario, usuario.Email });
         }
-        catch (BusinessException ex) { return Conflict(new { ex.Message }); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
+        catch (BusinessException ex) { return base.Conflict(new { ex.Message }); }
+        catch (Exceptions.Exceptions ex) { return base.NotFound(new { ex.Message }); }
     }
 }

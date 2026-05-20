@@ -6,33 +6,37 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// Banco de dados MySQL
 var connectionString = builder.Configuration.GetConnectionString("mysql");
-builder.Services.AddDbContext<AppDbContext>(
-    options => options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 32)))
- );
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 32)))
+);
 
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    options.JsonSerializerOptions.WriteIndented = true;
+});
 
-
-builder.Services.AddControllers().AddJsonOptions(
-    options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.WriteIndented = true;
-    });
-
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<LivroService>();
+// AutoMapper
 builder.Services.AddAutoMapper(config => config.AddProfile<LivroProfile>());
+
+// Services (injeção de dependência)
+builder.Services.AddScoped<AutorService>();
+builder.Services.AddScoped<CategoriaService>();
+builder.Services.AddScoped<LivroService>();
+builder.Services.AddScoped<MembroService>();
+builder.Services.AddScoped<ExemplarService>();
+builder.Services.AddScoped<EmprestimoService>();
+builder.Services.AddScoped<ReservaService>();
+builder.Services.AddScoped<UsuarioService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -40,7 +44,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

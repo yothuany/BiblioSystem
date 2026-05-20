@@ -1,22 +1,27 @@
-﻿using System.ComponentModel.DataAnnotations;
+namespace BiblioSystem.Dtos.Livro;
 
-namespace BiblioSystem.Dtos
-{
-    public class LivroDto
-    {
-        [Required(ErrorMessage = "O campo Titulo é obrigatório")]
-        [MinLength(5, ErrorMessage = "Obrigatório mínimo de 5 caracteres")]
-        public required string Titulo { get; set; }
+public record LivroCreateDto(
+    string Titulo,
+    string Isbn,
+    int AnoPublicacao,
+    string Editora,
+    List<int> AutorIds,
+    List<int> CategoriaIds
+);
 
-        [Required(ErrorMessage = "O campo Autor é obrigatório")]
-        [MinLength(5, ErrorMessage = "Obrigatório mínimo de 5 caracteres")]
-        public required string Autor { get; set; }
+public record LivroUpdateDto(
+    string Titulo,
+    string Isbn,
+    int AnoPublicacao,
+    string Editora
+);
 
-        [Required(ErrorMessage = "O campo Categoria é obrigatório")]
-        public required int CategoriaId { get; set; }
-
-        [Required(ErrorMessage = "O campo Ano é obrigatório")]
-        [Range(1, 9999, ErrorMessage = "Ano inválido")]
-        public required int Ano { get; set; }
-    }
-}
+public record LivroResponseDto(
+    int IdLivro,
+    string Titulo,
+    string Isbn,
+    int AnoPublicacao,
+    string Editora,
+    List<string> Autores,
+    List<string> Categorias
+);

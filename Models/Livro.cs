@@ -1,32 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+namespace BiblioSystem.Models;
 
-namespace BiblioSystem.Models
+public class Livro
 {
-    [Table("livros"), PrimaryKey(nameof(Id))]
-    public class Livro
-    {
-        [Column("id")]
-        public int Id { get; set; }
+    public int IdLivro { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string Isbn { get; set; } = string.Empty;
+    public int AnoPublicacao { get; set; }
+    public string Editora { get; set; } = string.Empty;
 
-        [Column("titulo")]
-        public required string Titulo { get; set; }
-
-        [Column("autor")]
-        public required string Autor { get; set; }
-
-        [Column("ano")]
-        public required int Ano { get; set; }
-
-        public string Situacao { get; set; }
-
-        public DateTime? DataAtualizacao { get; set; }
-
-        [JsonIgnore]
-        [Column("categoria_id")]
-        public int? CategoriaId { get; set; }
-
-        public virtual Categoria? Categoria { get; set; }
-    }
+    public ICollection<LivroAutor> LivroAutores { get; set; } = [];
+    public ICollection<LivroCategoria> LiveCategoria { get; set; } = [];
+    public ICollection<Exemplar> Exemplares { get; set; } = [];
+    public ICollection<Reserva> Reservas { get; set; } = [];
 }
