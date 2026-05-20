@@ -33,3 +33,4 @@ C:\Users\celes\source\repos\BiblioSystem\BiblioSystem\obj\Debug\net8.0\refint\Bi
 C:\Users\celes\source\repos\BiblioSystem\BiblioSystem\obj\Debug\net8.0\BiblioSystem.pdb
 C:\Users\celes\source\repos\BiblioSystem\BiblioSystem\obj\Debug\net8.0\BiblioSystem.genruntimeconfig.cache
 C:\Users\celes\source\repos\BiblioSystem\BiblioSystem\obj\Debug\net8.0\ref\BiblioSystem.dll
+C:\Users\celes\source\repos\BiblioSystem\BiblioSystem\obj\Debug\net8.0\BiblioSystem.sourcelink.json
