@@ -27,6 +27,7 @@ public class ReservaService(AppDbContext db, IMapper mapper)
         return mapper.Map<ReservaResponseDto>(reserva);
     }
 
+    // RF09 - Realizar reserva de livro indisponível
     public async Task<ReservaResponseDto> CreateAsync(ReservaCreateDto dto)
     {
         var membroExiste = await db.Membros.AnyAsync(m => m.IdMembro == dto.MembroIdMembro);
@@ -37,6 +38,7 @@ public class ReservaService(AppDbContext db, IMapper mapper)
         if (!livroExiste)
             throw new NotFoundException($"Livro com id {dto.LivroIdLivro} não encontrado.");
 
+        // Verifica se já existe reserva pendente deste membro para este livro
         var reservaExistente = await db.Reservas.AnyAsync(r =>
             r.MembroIdMembro == dto.MembroIdMembro &&
             r.LivroIdLivro == dto.LivroIdLivro &&

@@ -8,6 +8,7 @@ namespace BiblioSystem.Services;
 
 public class UsuarioService(AppDbContext db)
 {
+    // RF11 - Autenticação por e-mail e senha
     public async Task<LoginResponseDto> LoginAsync(LoginDto dto)
     {
         var usuario = await db.Usuarios
@@ -19,6 +20,7 @@ public class UsuarioService(AppDbContext db)
         if (!senhaValida)
             throw new UnauthorizedException("E-mail ou senha inválidos.");
 
+        // Retorna token simples (pode ser substituído por JWT)
         var token = Convert.ToBase64String(Guid.NewGuid().ToByteArray());
 
         return new LoginResponseDto(token, usuario.Membro.Nome, usuario.Email);

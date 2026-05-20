@@ -29,18 +29,22 @@ public class EmprestimoService(AppDbContext db, IMapper mapper)
         return mapper.Map<EmprestimoResponseDto>(emprestimo);
     }
 
+    // RF06 - Realizar empréstimo
     public async Task<EmprestimoResponseDto> CreateAsync(EmprestimoCreateDto dto)
     {
+        // Verifica se membro existe
         var membroExiste = await db.Membros.AnyAsync(m => m.IdMembro == dto.MembroIdMembro);
         if (!membroExiste)
             throw new NotFoundException($"Membro com id {dto.MembroIdMembro} não encontrado.");
 
+        // Verifica disponibilidade do exemplar (RF06 + RF01 regra de negócio)
         var exemplar = await db.Exemplares.FindAsync(dto.ExemplarIdExemplar)
             ?? throw new NotFoundException($"Exemplar com id {dto.ExemplarIdExemplar} não encontrado.");
 
         if (exemplar.Status != "disponivel")
             throw new BusinessException($"Exemplar {exemplar.Codigo} não está disponível para empréstimo. Status atual: {exemplar.Status}.");
 
+        // Cria empréstimo e atualiza status do exemplar
         var emprestimo = mapper.Map<Emprestimo>(dto);
         exemplar.Status = "emprestado";
 
@@ -50,6 +54,7 @@ public class EmprestimoService(AppDbContext db, IMapper mapper)
         return await GetByIdAsync(emprestimo.IdEmprestimo);
     }
 
+    // RF07 + RF08 - Registrar devolução com cálculo de multa
     public async Task<EmprestimoResponseDto> RegistrarDevolucaoAsync(int id, EmprestimoDevolucaoDto dto)
     {
         var emprestimo = await QueryComIncludes().FirstOrDefaultAsync(e => e.IdEmprestimo == id)
@@ -60,12 +65,14 @@ public class EmprestimoService(AppDbContext db, IMapper mapper)
 
         emprestimo.DataDevolucao = dto.DataDevolucao;
 
+        // RF08 - Cálculo automático de multa por atraso
         if (dto.DataDevolucao > emprestimo.DataPrevistaDevolucao)
         {
             var diasAtraso = dto.DataDevolucao.DayNumber - emprestimo.DataPrevistaDevolucao.DayNumber;
             emprestimo.ValorMulta = diasAtraso * MultaPorDia;
         }
 
+        // Libera o exemplar
         emprestimo.Exemplar.Status = "disponivel";
 
         await db.SaveChangesAsync();

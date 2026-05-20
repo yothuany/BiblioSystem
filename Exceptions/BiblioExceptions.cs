@@ -1,6 +1,6 @@
 ﻿namespace BiblioSystem.Exceptions;
 
-public class Exceptions(string message) : Exception(message);
+public class NotFoundException(string message) : Exception(message);
 
 public class BusinessException(string message) : Exception(message);
 
