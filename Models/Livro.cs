@@ -1,15 +1,28 @@
-namespace BiblioSystem.Models;
+using BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Livro
+namespace BiblioSystem.Models
 {
-    public int IdLivro { get; set; }
-    public string Titulo { get; set; } = string.Empty;
-    public string Isbn { get; set; } = string.Empty;
-    public int AnoPublicacao { get; set; }
-    public string Editora { get; set; } = string.Empty;
+    [Table("livros"), PrimaryKey(nameof(Id))]
+    public class Livro
+    {
+        public int Id { get; set; }
 
-    public ICollection<LivroAutor> LivroAutores { get; set; } = [];
-    public ICollection<LivroCategoria> LiveCategoria { get; set; } = [];
-    public ICollection<Exemplar> Exemplares { get; set; } = [];
-    public ICollection<Reserva> Reservas { get; set; } = [];
+        public required string Titulo { get; set; }
+
+        public required string ISBN { get; set; }
+
+        public int AnoPublicacao { get; set; }
+
+        public required string Editora { get; set; }
+
+        public int CategoriaId { get; set; }
+
+        public virtual Categoria? Categoria { get; set; }
+
+        public ICollection<Autor>? Autores { get; set; }
+
+        public ICollection<Exemplar>? Exemplares { get; set; }
+    }
 }

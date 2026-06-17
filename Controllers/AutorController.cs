@@ -1,43 +1,93 @@
-using BiblioSystem.Dtos.Autor;
-using BiblioSystem.Exceptions;
+using BiblioSystem.Controllers.Filters;
+using BiblioSystem.Dtos;
 using BiblioSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiblioSystem.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class AutorController(AutorService service) : ControllerBase
+namespace BiblioSystem.Controllers
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [ApiController]
+    [Route("autores")]
+    [Authorize]
+    public class AutorController : ControllerBase
     {
-        try { return Ok(await service.GetByIdAsync(id)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        private readonly AutorService _service;
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] AutorCreateDto dto)
-    {
-        var autor = await service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = autor.IdAutor }, autor);
-    }
+        public AutorController(
+            AutorService service
+        )
+        {
+            _service = service;
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] AutorUpdateDto dto)
-    {
-        try { return Ok(await service.UpdateAsync(id, dto)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        [HttpGet]
+        public async Task<IActionResult>
+        FindAll()
+        {
+            return Ok(
+                await _service
+                .FindAll()
+            );
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try { await service.DeleteAsync(id); return NoContent(); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
+        [HttpGet("v2")]
+        public async Task<IActionResult>
+        FindAllV2(
+            [FromQuery]
+            AutorFilter filter
+        )
+        {
+            return Ok(
+                await _service
+                .FindAllV2(
+                    filter
+                )
+            );
+        }
+
+        [HttpPost]
+        public async Task<IActionResult>
+        Create(
+            AutorDto data
+        )
+        {
+            return Created(
+                "",
+                await _service
+                .Create(
+                    data
+                )
+            );
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult>
+        Update(
+            int id,
+            AutorDto data
+        )
+        {
+            return Ok(
+                await _service
+                .Update(
+                    id,
+                    data
+                )
+            );
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult>
+        Remove(
+            int id
+        )
+        {
+            await _service
+                .Remove(
+                    id
+                );
+
+            return NoContent();
+        }
     }
 }

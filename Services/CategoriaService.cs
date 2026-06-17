@@ -1,49 +1,190 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
-using BiblioSystem.Dtos.Categoria;
+using BiblioSystem.Dtos;
+using BiblioSystem.Dtos.Responses;
 using BiblioSystem.Exceptions;
+using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BiblioSystem.Services;
-
-public class CategoriaService(AppDbContext db, IMapper mapper)
+namespace BiblioSystem.Services
 {
-    public async Task<List<CategoriaResponseDto>> GetAllAsync()
+    public class CategoriaService
     {
-        var categorias = await db.Categorias.ToListAsync();
-        return mapper.Map<List<CategoriaResponseDto>>(categorias);
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<CategoriaResponseDto> GetByIdAsync(int id)
-    {
-        var categoria = await db.Categorias.FindAsync(id)
-            ?? throw new NotFoundException($"Categoria com id {id} não encontrada.");
-        return mapper.Map<CategoriaResponseDto>(categoria);
-    }
+        private readonly IMapper _mapper;
 
-    public async Task<CategoriaResponseDto> CreateAsync(CategoriaCreateDto dto)
-    {
-        var categoria = mapper.Map<Categoria>(dto);
-        db.Categorias.Add(categoria);
-        await db.SaveChangesAsync();
-        return mapper.Map<CategoriaResponseDto>(categoria);
-    }
+        public CategoriaService(
+            AppDbContext context,
+            IMapper mapper
+        )
+        {
+            _context = context;
+            _mapper = mapper;
+        }
 
-    public async Task<CategoriaResponseDto> UpdateAsync(int id, CategoriaUpdateDto dto)
-    {
-        var categoria = await db.Categorias.FindAsync(id)
-            ?? throw new NotFoundException($"Categoria com id {id} não encontrada.");
-        mapper.Map(dto, categoria);
-        await db.SaveChangesAsync();
-        return mapper.Map<CategoriaResponseDto>(categoria);
-    }
+        public async Task<
+            ICollection<
+                CategoriaResponseDto
+            >
+        > FindAll()
+        {
+            try
+            {
+                return await _context
+                    .Categorias
+                    .ProjectTo<
+                        CategoriaResponseDto
+                    >(
+                        _mapper.ConfigurationProvider
+                    )
+                    .ToListAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-    public async Task DeleteAsync(int id)
-    {
-        var categoria = await db.Categorias.FindAsync(id)
-            ?? throw new NotFoundException($"Categoria com id {id} não encontrada.");
-        db.Categorias.Remove(categoria);
-        await db.SaveChangesAsync();
+        public async Task<
+            Categoria
+        > Create(
+            CategoriaDto data
+        )
+        {
+            try
+            {
+                var categoria =
+                    _mapper
+                    .Map<Categoria>(
+                        data
+                    );
+
+                await _context
+                    .Categorias
+                    .AddAsync(
+                        categoria
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+
+                return categoria;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Categoria
+        > FindById(
+            int id
+        )
+        {
+            try
+            {
+                var categoria =
+                    await _context
+                    .Categorias
+                    .FirstOrDefaultAsync(
+                        x =>
+                        x.Id
+                        ==
+                        id
+                    );
+
+                if (
+                    categoria
+                    is null
+                )
+                {
+                    throw new ErrorServiceException(
+                        "Categoria não encontrada",
+
+                        c =>
+                        c.NotFound(
+                            new
+                            {
+                                message =
+                                $"Categoria #{id} não encontrada"
+                            }
+                        )
+                    );
+                }
+
+                return categoria;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Categoria
+        > Update(
+            int id,
+            CategoriaDto data
+        )
+        {
+            try
+            {
+                var categoria =
+                    await FindById(
+                        id
+                    );
+
+                _mapper.Map(
+                    data,
+                    categoria
+                );
+
+                _context
+                    .Categorias
+                    .Update(
+                        categoria
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+
+                return categoria;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task Remove(
+            int id
+        )
+        {
+            try
+            {
+                var categoria =
+                    await FindById(
+                        id
+                    );
+
+                _context
+                    .Categorias
+                    .Remove(
+                        categoria
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

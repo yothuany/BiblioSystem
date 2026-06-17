@@ -1,47 +1,69 @@
-using BiblioSystem.Dtos.Exemplar;
-using BiblioSystem.Exceptions;
+using BiblioSystem.Controllers.Filters;
+using BiblioSystem.Dtos;
 using BiblioSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiblioSystem.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class ExemplarController(ExemplarService service) : ControllerBase
+namespace BiblioSystem.Controllers
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [ApiController]
+    [Route("exemplares")]
+    [Authorize]
+    public class ExemplarController : ControllerBase
     {
-        try { return Ok(await service.GetByIdAsync(id)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        private readonly ExemplarService _service;
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ExemplarCreateDto dto)
-    {
-        try
+        public ExemplarController(
+            ExemplarService service
+        )
         {
-            var exemplar = await service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = exemplar.IdExemplar }, exemplar);
+            _service = service;
         }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] ExemplarUpdateDto dto)
-    {
-        try { return Ok(await service.UpdateAsync(id, dto)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        [HttpGet]
+        public async Task<IActionResult>
+        FindAll(
+            [FromQuery]
+            ExemplarFilter filter
+        )
+        {
+            return Ok(
+                await _service
+                .FindAllV2(
+                    filter
+                )
+            );
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try { await service.DeleteAsync(id); return NoContent(); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
+        [HttpPost]
+        public async Task<IActionResult>
+        Create(
+            ExemplarDto data
+        )
+        {
+            return Created(
+                "",
+                await _service
+                .Create(
+                    data
+                )
+            );
+        }
+
+        [HttpPatch("{id}/status")]
+        public async Task<IActionResult>
+        UpdateStatus(
+            int id,
+            string status
+        )
+        {
+            return Ok(
+                await _service
+                .UpdateStatus(
+                    id,
+                    status
+                )
+            );
+        }
     }
 }

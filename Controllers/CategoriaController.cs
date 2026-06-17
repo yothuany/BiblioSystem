@@ -1,43 +1,99 @@
-using BiblioSystem.Dtos.Categoria;
+using BiblioSystem.Dtos;
 using BiblioSystem.Exceptions;
 using BiblioSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiblioSystem.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class CategoriaController(CategoriaService service) : ControllerBase
+namespace BiblioSystem.Controllers
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [Route("/categorias")]
+    [ApiController]
+    [Authorize]
+    public class CategoriaController : ControllerBase
     {
-        try { return Ok(await service.GetByIdAsync(id)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        private readonly CategoriaService _service;
 
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CategoriaCreateDto dto)
-    {
-        var categoria = await service.CreateAsync(dto);
-        return CreatedAtAction(nameof(GetById), new { id = categoria.IdCategoria }, categoria);
-    }
+        public CategoriaController(CategoriaService service)
+        {
+            _service = service;
+        }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] CategoriaUpdateDto dto)
-    {
-        try { return Ok(await service.UpdateAsync(id, dto)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        [HttpGet()]
+        public async Task<IActionResult> FindAll()
+        {
+            try
+            {
+                var categorias = await _service.FindAll();
+                return Ok(categorias);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try { await service.DeleteAsync(id); return NoContent(); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
+        [HttpGet("{id}")]
+        public async Task<IActionResult> FindById(int id)
+        {
+            try
+            {
+                var categoria = await _service.FindById(id);
+                return Ok(categoria);
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        [HttpPost()]
+        public async Task<IActionResult> Create([FromBody] CategoriaDto novaCategoria)
+        {
+            try
+            {
+                var categoria = await _service.Create(novaCategoria);
+                return Created("", categoria);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoriaDto categoriaDto)
+        {
+            try
+            {
+                var categoria = await _service.Update(id, categoriaDto);
+                return Ok(categoria);
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Remove(int id)
+        {
+            try
+            {
+                await _service.Remove(id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
     }
 }

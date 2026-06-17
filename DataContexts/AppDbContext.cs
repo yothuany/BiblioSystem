@@ -1,56 +1,54 @@
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BiblioSystem.DataContexts;
-
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+namespace BiblioSystem.DataContexts
 {
-    public DbSet<Livro> Livros { get; set; }
-    public DbSet<Autor> Autores { get; set; }
-    public DbSet<Categoria> Categorias { get; set; }
-    public DbSet<LivroAutor> LivroAutores { get; set; }
-    public DbSet<LivroCategoria> LiveCategorias { get; set; }
-    public DbSet<Exemplar> Exemplares { get; set; }
-    public DbSet<Membro> Membros { get; set; }
-    public DbSet<Emprestimo> Emprestimos { get; set; }
-    public DbSet<Reserva> Reservas { get; set; }
-    public DbSet<Usuario> Usuarios { get; set; }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    public class AppDbContext : DbContext
     {
-        modelBuilder.Entity<LivroAutor>()
-            .HasKey(la => new { la.LivroIdLivro, la.AutorIdAutor });
+        public AppDbContext(
+            DbContextOptions<AppDbContext> options
+        ) : base(options) { }
 
-        modelBuilder.Entity<LivroCategoria>()
-            .HasKey(lc => new { lc.LivroIdLivro, lc.CategoriaIdCategoria });
+        public DbSet<Livro> Livros { get; set; }
 
-        modelBuilder.Entity<LivroAutor>()
-            .HasOne(la => la.Livro)
-            .WithMany(l => l.LivroAutores)
-            .HasForeignKey(la => la.LivroIdLivro);
+        public DbSet<Exemplar> Exemplares { get; set; }
 
-        modelBuilder.Entity<LivroAutor>()
-            .HasOne(la => la.Autor)
-            .WithMany(a => a.LivroAutores)
-            .HasForeignKey(la => la.AutorIdAutor);
+        public DbSet<Membro> Membros { get; set; }
 
-        modelBuilder.Entity<LivroCategoria>()
-            .HasOne(lc => lc.Livro)
-            .WithMany(l => l.LiveCategoria)
-            .HasForeignKey(lc => lc.LivroIdLivro);
+        public DbSet<Autor> Autores { get; set; }
 
-        modelBuilder.Entity<LivroCategoria>()
-            .HasOne(lc => lc.Categoria)
-            .WithMany(c => c.LiveCategoria)
-            .HasForeignKey(lc => lc.CategoriaIdCategoria);
+        public DbSet<Categoria> Categorias { get; set; }
 
-        modelBuilder.Entity<Usuario>()
-            .HasOne(u => u.Membro)
-            .WithOne(m => m.Usuario)
-            .HasForeignKey<Usuario>(u => u.MembroIdMembro);
+        public DbSet<Emprestimo> Emprestimos { get; set; }
 
-        modelBuilder.Entity<Emprestimo>()
-            .Property(e => e.ValorMulta)
-            .HasPrecision(10, 2);
+        public DbSet<Reserva> Reservas { get; set; }
+
+        public DbSet<Usuario> Usuarios { get; set; }
+
+        protected override void OnModelCreating(
+            ModelBuilder modelBuilder
+        )
+        {
+            modelBuilder.Entity<Livro>()
+                .HasMany(l => l.Autores)
+                .WithMany(a => a.Livros)
+                .UsingEntity<Dictionary<string, object>>(
+                    "LivroAutor",
+
+                    f => f
+                        .HasOne<Autor>()
+                        .WithMany()
+                        .HasForeignKey("autor_id"),
+
+                    f => f
+                        .HasOne<Livro>()
+                        .WithMany()
+                        .HasForeignKey("livro_id"),
+
+                    f => f.ToTable("livros_autores")
+                );
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

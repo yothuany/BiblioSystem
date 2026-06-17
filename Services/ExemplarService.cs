@@ -1,54 +1,207 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
-using BiblioSystem.Dtos.Exemplar;
+using BiblioSystem.Dtos;
+using BiblioSystem.Dtos.Responses;
 using BiblioSystem.Exceptions;
+using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BiblioSystem.Services;
-
-public class ExemplarService(AppDbContext db, IMapper mapper)
+namespace BiblioSystem.Services
 {
-    public async Task<List<ExemplarResponseDto>> GetAllAsync()
+    public class ExemplarService
     {
-        var exemplares = await db.Exemplares.Include(e => e.Livro).ToListAsync();
-        return mapper.Map<List<ExemplarResponseDto>>(exemplares);
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<ExemplarResponseDto> GetByIdAsync(int id)
-    {
-        var exemplar = await db.Exemplares.Include(e => e.Livro).FirstOrDefaultAsync(e => e.IdExemplar == id)
-            ?? throw new NotFoundException($"Exemplar com id {id} não encontrado.");
-        return mapper.Map<ExemplarResponseDto>(exemplar);
-    }
+        private readonly IMapper _mapper;
 
-    public async Task<ExemplarResponseDto> CreateAsync(ExemplarCreateDto dto)
-    {
-        var livroExiste = await db.Livros.AnyAsync(l => l.IdLivro == dto.LivroIdLivro);
-        if (!livroExiste)
-            throw new NotFoundException($"Livro com id {dto.LivroIdLivro} não encontrado.");
+        public ExemplarService(
+            AppDbContext context,
+            IMapper mapper
+        )
+        {
+            _context = context;
+            _mapper = mapper;
+        }
 
-        var exemplar = mapper.Map<Exemplar>(dto);
-        db.Exemplares.Add(exemplar);
-        await db.SaveChangesAsync();
+        public async Task<
+            PaginatedResponse<
+                ExemplarResponseDto
+            >
+        > FindAllV2(
+            ExemplarFilter filter
+        )
+        {
+            try
+            {
+                var query =
+                    _context
+                    .Exemplares
+                    .AsQueryable();
 
-        return await GetByIdAsync(exemplar.IdExemplar);
-    }
+                if (filter.Status is not null)
+                {
+                    query =
+                        query.Where(
+                            x =>
+                            x.Status
+                            ==
+                            filter.Status
+                        );
+                }
 
-    public async Task<ExemplarResponseDto> UpdateAsync(int id, ExemplarUpdateDto dto)
-    {
-        var exemplar = await db.Exemplares.Include(e => e.Livro).FirstOrDefaultAsync(e => e.IdExemplar == id)
-            ?? throw new NotFoundException($"Exemplar com id {id} não encontrado.");
-        mapper.Map(dto, exemplar);
-        await db.SaveChangesAsync();
-        return mapper.Map<ExemplarResponseDto>(exemplar);
-    }
+                if (filter.LivroId is not null)
+                {
+                    query =
+                        query.Where(
+                            x =>
+                            x.LivroId
+                            ==
+                            filter.LivroId
+                        );
+                }
 
-    public async Task DeleteAsync(int id)
-    {
-        var exemplar = await db.Exemplares.FindAsync(id)
-            ?? throw new NotFoundException($"Exemplar com id {id} não encontrado.");
-        db.Exemplares.Remove(exemplar);
-        await db.SaveChangesAsync();
+                return await
+                    Paginate<Exemplar>
+                    .Set<
+                        ExemplarResponseDto
+                    >(
+                        query,
+                        filter,
+                        _mapper
+                    );
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Exemplar
+        > Create(
+            ExemplarDto data
+        )
+        {
+            try
+            {
+                var livro =
+                    await _context
+                    .Livros
+                    .AnyAsync(
+                        x =>
+                        x.Id
+                        ==
+                        data.LivroId
+                    );
+
+                if (!livro)
+                {
+                    throw new ErrorServiceException(
+                        "Livro não encontrado",
+
+                        c =>
+                        c.NotFound(
+                            new
+                            {
+                                message =
+                                "Livro inválido"
+                            }
+                        )
+                    );
+                }
+
+                var exemplar =
+                    _mapper
+                    .Map<Exemplar>(
+                        data
+                    );
+
+                await _context
+                    .Exemplares
+                    .AddAsync(
+                        exemplar
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+
+                return exemplar;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Exemplar
+        > FindById(
+            int id
+        )
+        {
+            try
+            {
+                var exemplar =
+                    await _context
+                    .Exemplares
+                    .FirstOrDefaultAsync(
+                        x =>
+                        x.Id
+                        ==
+                        id
+                    );
+
+                if (exemplar is null)
+                {
+                    throw new ErrorServiceException(
+                        "Exemplar não encontrado",
+
+                        c =>
+                        c.NotFound(
+                            new
+                            {
+                                message =
+                                $"Exemplar #{id} não encontrado"
+                            }
+                        )
+                    );
+                }
+
+                return exemplar;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Exemplar
+        > UpdateStatus(
+            int id,
+            string status
+        )
+        {
+            try
+            {
+                var exemplar =
+                    await FindById(id);
+
+                exemplar.Status =
+                    status;
+
+                await _context
+                    .SaveChangesAsync();
+
+                return exemplar;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

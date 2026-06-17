@@ -1,27 +1,23 @@
-namespace BiblioSystem.Dtos.Livro;
+using System.ComponentModel.DataAnnotations;
 
-public record LivroCreateDto(
-    string Titulo,
-    string Isbn,
-    int AnoPublicacao,
-    string Editora,
-    List<int> AutorIds,
-    List<int> CategoriaIds
-);
+namespace BiblioSystem.Dtos
+{
+    public class LivroDto
+    {
+        [Required]
+        public required string Titulo { get; set; }
 
-public record LivroUpdateDto(
-    string Titulo,
-    string Isbn,
-    int AnoPublicacao,
-    string Editora
-);
+        [Required]
+        public required string ISBN { get; set; }
 
-public record LivroResponseDto(
-    int IdLivro,
-    string Titulo,
-    string Isbn,
-    int AnoPublicacao,
-    string Editora,
-    List<string> Autores,
-    List<string> Categorias
-);
+        [Required]
+        public int AnoPublicacao { get; set; }
+
+        [Required]
+        public required string Editora { get; set; }
+
+        [Required]
+        public int CategoriaId { get; set; }
+    }
+
+}

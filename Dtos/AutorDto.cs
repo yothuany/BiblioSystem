@@ -1,5 +1,25 @@
-namespace BiblioSystem.Dtos.Autor;
+using System.ComponentModel.DataAnnotations;
 
-public record AutorCreateDto(string Nome, string? Biografia);
-public record AutorUpdateDto(string Nome, string? Biografia);
-public record AutorResponseDto(int IdAutor, string Nome, string? Biografia);
+namespace BiblioSystem.Dtos
+{
+    public class AutorDto
+    {
+        [Required(
+            ErrorMessage = "O campo Nome é obrigatório"
+        )]
+        [MinLength(
+            3,
+            ErrorMessage = "Obrigatório mínimo de 3 caracteres"
+        )]
+        public required string Nome { get; set; }
+
+        [Required(
+            ErrorMessage = "O campo Biografia é obrigatória"
+        )]
+        [MinLength(
+            10,
+            ErrorMessage = "Obrigatório mínimo de 10 caracteres"
+        )]
+        public required string Biografia { get; set; }
+    }
+}

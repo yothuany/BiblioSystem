@@ -1,5 +1,13 @@
-namespace BiblioSystem.Dtos.Exemplar;
+using System.ComponentModel.DataAnnotations;
 
-public record ExemplarCreateDto(string Codigo, int LivroIdLivro);
-public record ExemplarUpdateDto(string Codigo, string Status);
-public record ExemplarResponseDto(int IdExemplar, string Codigo, string Status, int LivroIdLivro, string TituloLivro);
+namespace BiblioSystem.Dtos
+{
+    public class ExemplarDto
+    {
+        [Required]
+        public required string CodigoExemplar { get; set; }
+
+        [Required]
+        public int LivroId { get; set; }
+    }
+}

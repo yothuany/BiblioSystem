@@ -1,14 +1,29 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Reserva
+namespace BiblioSystem.Models
 {
-    public int IdReserva { get; set; }
-    public DateOnly DataReserva { get; set; } = DateOnly.FromDateTime(DateTime.Today);
-    public string Status { get; set; } = "pendente"; // pendente | atendida | cancelada
+    [Table("reservas")]
+    [PrimaryKey(nameof(Id))]
+    public class Reserva
+    {
+        public int Id { get; set; }
 
-    public int MembroIdMembro { get; set; }
-    public Membro Membro { get; set; } = null!;
 
-    public int LivroIdLivro { get; set; }
-    public Livro Livro { get; set; } = null!;
+        public int MembroId { get; set; }
+
+        public virtual Membro? Membro { get; set; }
+
+
+        public int LivroId { get; set; }
+
+        public virtual Livro? Livro { get; set; }
+
+
+        public DateTime DataReserva { get; set; }
+
+
+        public string Status { get; set; }
+            = "ativa";
+    }
 }

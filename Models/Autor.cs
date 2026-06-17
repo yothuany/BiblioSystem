@@ -1,10 +1,17 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Autor
+namespace BiblioSystem.Models
 {
-    public int IdAutor { get; set; }
-    public string Nome { get; set; } = string.Empty;
-    public string? Biografia { get; set; }
+    [Table("autores"), PrimaryKey(nameof(Id))]
+    public class Autor
+    {
+        public int Id { get; set; }
 
-    public ICollection<LivroAutor> LivroAutores { get; set; } = [];
+        public required string Nome { get; set; }
+
+        public required string Biografia { get; set; }
+
+        public ICollection<Livro>? Livros { get; set; }
+    }
 }

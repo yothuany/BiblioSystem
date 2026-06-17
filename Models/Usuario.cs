@@ -1,11 +1,17 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Usuario
+namespace BiblioSystem.Models
 {
-    public int IdUsuario { get; set; }
-    public string Email { get; set; } = string.Empty;
-    public string Senha { get; set; } = string.Empty; // hash BCrypt
+    [Table("usuarios"), PrimaryKey(nameof(Id))]
+    public class Usuario
+    {
+        public int Id { get; set; }
 
-    public int MembroIdMembro { get; set; }
-    public Membro Membro { get; set; } = null!;
+        public required string Nome { get; set; }
+
+        public required string Email { get; set; }
+
+        public required string Senha { get; set; }
+    }
 }

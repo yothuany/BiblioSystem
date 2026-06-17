@@ -1,13 +1,19 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Exemplar
+namespace BiblioSystem.Models
 {
-    public int IdExemplar { get; set; }
-    public string Codigo { get; set; } = string.Empty;
-    public string Status { get; set; } = "disponivel"; // disponivel | emprestado | reservado
+    [Table("exemplares"), PrimaryKey(nameof(Id))]
+    public class Exemplar
+    {
+        public int Id { get; set; }
 
-    public int LivroIdLivro { get; set; }
-    public Livro Livro { get; set; } = null!;
+        public required string CodigoExemplar { get; set; }
 
-    public ICollection<Emprestimo> Emprestimos { get; set; } = [];
+        public required string Status { get; set; }
+
+        public int LivroId { get; set; }
+
+        public virtual Livro? Livro { get; set; }
+    }
 }

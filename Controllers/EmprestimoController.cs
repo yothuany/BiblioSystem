@@ -1,44 +1,51 @@
-using BiblioSystem.Dtos.Emprestimo;
-using BiblioSystem.Exceptions;
+using BiblioSystem.Dtos;
 using BiblioSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiblioSystem.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class EmprestimoController(EmprestimoService service) : ControllerBase
+namespace BiblioSystem.Controllers
 {
-    [HttpGet]
-    public async Task<IActionResult> GetAll() =>
-        Ok(await service.GetAllAsync());
-
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [ApiController]
+    [Route("emprestimos")]
+    [Authorize]
+    public class EmprestimoController : ControllerBase
     {
-        try { return Ok(await service.GetByIdAsync(id)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-    }
+        private readonly EmprestimoService _service;
 
-    // RF06 - Realizar empréstimo
-    [HttpPost]
-    public async Task<IActionResult> Create([FromBody] EmprestimoCreateDto dto)
-    {
-        try
+        public EmprestimoController(
+            EmprestimoService service
+        )
         {
-            var emprestimo = await service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetById), new { id = emprestimo.IdEmprestimo }, emprestimo);
+            _service = service;
         }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-        catch (BusinessException ex) { return Conflict(new { ex.Message }); }
-    }
 
-    // RF07 + RF08 - Registrar devolução com cálculo de multa
-    [HttpPatch("{id}/devolver")]
-    public async Task<IActionResult> Devolver(int id, [FromBody] EmprestimoDevolucaoDto dto)
-    {
-        try { return Ok(await service.RegistrarDevolucaoAsync(id, dto)); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
-        catch (BusinessException ex) { return Conflict(new { ex.Message }); }
+        [HttpPost]
+        public async Task<IActionResult>
+        Create(
+            EmprestimoDto data
+        )
+        {
+            return Created(
+                "",
+                await _service
+                .Create(
+                    data
+                )
+            );
+        }
+
+        [HttpPatch("{id}/devolucao")]
+        public async Task<IActionResult>
+        RegistrarDevolucao(
+            int id
+        )
+        {
+            return Ok(
+                await _service
+                .RegistrarDevolucao(
+                    id
+                )
+            );
+        }
     }
 }

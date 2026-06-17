@@ -1,15 +1,26 @@
-namespace BiblioSystem.Models;
+using BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Membro
+namespace BiblioSystem.Models
 {
-    public int IdMembro { get; set; }
-    public string Nome { get; set; } = string.Empty;
-    public string Cpf { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Telefone { get; set; } = string.Empty;
-    public DateOnly DataCadastro { get; set; } = DateOnly.FromDateTime(DateTime.Today);
+    [Table("membros"), PrimaryKey(nameof(Id))]
+    public class Membro
+    {
+        public int Id { get; set; }
 
-    public ICollection<Emprestimo> Emprestimos { get; set; } = [];
-    public ICollection<Reserva> Reservas { get; set; } = [];
-    public Usuario? Usuario { get; set; }
+        public required string NomeCompleto { get; set; }
+
+        public required string CPF { get; set; }
+
+        public required string Email { get; set; }
+
+        public required string Telefone { get; set; }
+
+        public DateOnly DataCadastro { get; set; }
+
+        public ICollection<Emprestimo>? Emprestimos { get; set; }
+
+        public ICollection<Reserva>? Reservas { get; set; }
+    }
 }

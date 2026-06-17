@@ -1,5 +1,11 @@
-namespace BiblioSystem.Dtos.Usuario;
+namespace BiblioSystem.Dtos
+{
+    public class UsuarioDto
+    {
+        public string Nome { get; set; }
 
-public record UsuarioCreateDto(string Email, string Senha, int MembroIdMembro);
-public record LoginDto(string Email, string Senha);
-public record LoginResponseDto(string Token, string Nome, string Email);
+        public string Email { get; set; }
+
+        public string Senha { get; set; }
+    }
+}

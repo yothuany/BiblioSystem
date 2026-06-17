@@ -1,10 +1,17 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Categoria
+namespace BiblioSystem.Models
 {
-    public int IdCategoria { get; set; }
-    public string Nome { get; set; } = string.Empty;
-    public string? Descricao { get; set; }
+    [Table("categorias"), PrimaryKey(nameof(Id))]
+    public class Categoria
+    {
+        public int Id { get; set; }
 
-    public ICollection<LivroCategoria> LiveCategoria { get; set; } = [];
+        public required string Nome { get; set; }
+
+        public required string Descricao { get; set; }
+
+        public ICollection<Livro>? Livros { get; set; }
+    }
 }

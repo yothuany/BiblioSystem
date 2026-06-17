@@ -1,31 +1,39 @@
-using BiblioSystem.Dtos.Usuario;
-using BiblioSystem.Exceptions;
+using BiblioSystem.Dtos;
 using BiblioSystem.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BiblioSystem.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class UsuarioController(UsuarioService service) : ControllerBase
+namespace BiblioSystem.Controllers
 {
-    // RF11 - Autenticação de usuários
-    [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto dto)
+    [ApiController]
+    [Route("usuarios")]
+    public class UsuarioController : ControllerBase
     {
-        try { return Ok(await service.LoginAsync(dto)); }
-        catch (UnauthorizedException ex) { return Unauthorized(new { ex.Message }); }
-    }
+        private readonly UsuarioService _service;
 
-    [HttpPost("registrar")]
-    public async Task<IActionResult> Registrar([FromBody] UsuarioCreateDto dto)
-    {
-        try
+        public UsuarioController(
+            UsuarioService service
+        )
         {
-            var usuario = await service.CreateAsync(dto);
-            return Created(string.Empty, new { usuario.IdUsuario, usuario.Email });
+            _service = service;
         }
-        catch (BusinessException ex) { return Conflict(new { ex.Message }); }
-        catch (NotFoundException ex) { return NotFound(new { ex.Message }); }
+
+
+        [HttpPost]
+        public async Task<IActionResult>
+        Create(
+            UsuarioDto data
+        )
+        {
+            var usuario =
+                await _service
+                .Create(
+                    data
+                );
+
+            return Created(
+                "",
+                usuario
+            );
+        }
     }
 }

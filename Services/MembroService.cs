@@ -1,53 +1,130 @@
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
-using BiblioSystem.Dtos.Membro;
+using BiblioSystem.Dtos;
+using BiblioSystem.Dtos.Responses;
 using BiblioSystem.Exceptions;
+using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BiblioSystem.Services;
-
-public class MembroService(AppDbContext db, IMapper mapper)
+namespace BiblioSystem.Services
 {
-    public async Task<List<MembroResponseDto>> GetAllAsync()
+    public class MembroService
     {
-        var membros = await db.Membros.ToListAsync();
-        return mapper.Map<List<MembroResponseDto>>(membros);
-    }
+        private readonly AppDbContext _context;
 
-    public async Task<MembroResponseDto> GetByIdAsync(int id)
-    {
-        var membro = await db.Membros.FindAsync(id)
-            ?? throw new NotFoundException($"Membro com id {id} não encontrado.");
-        return mapper.Map<MembroResponseDto>(membro);
-    }
+        private readonly IMapper _mapper;
 
-    public async Task<MembroResponseDto> CreateAsync(MembroCreateDto dto)
-    {
-        var cpfExistente = await db.Membros.AnyAsync(m => m.Cpf == dto.Cpf);
-        if (cpfExistente)
-            throw new BusinessException("CPF já cadastrado.");
+        public MembroService(
+            AppDbContext context,
+            IMapper mapper
+        )
+        {
+            _context =
+                context;
 
-        var membro = mapper.Map<Membro>(dto);
-        db.Membros.Add(membro);
-        await db.SaveChangesAsync();
-        return mapper.Map<MembroResponseDto>(membro);
-    }
+            _mapper =
+                mapper;
+        }
 
-    public async Task<MembroResponseDto> UpdateAsync(int id, MembroUpdateDto dto)
-    {
-        var membro = await db.Membros.FindAsync(id)
-            ?? throw new NotFoundException($"Membro com id {id} não encontrado.");
-        mapper.Map(dto, membro);
-        await db.SaveChangesAsync();
-        return mapper.Map<MembroResponseDto>(membro);
-    }
+        public async Task<
+            Membro
+        > Create(
+            MembroDto data
+        )
+        {
+            try
+            {
+                var membro =
+                    _mapper
+                    .Map<Membro>(
+                        data
+                    );
 
-    public async Task DeleteAsync(int id)
-    {
-        var membro = await db.Membros.FindAsync(id)
-            ?? throw new NotFoundException($"Membro com id {id} não encontrado.");
-        db.Membros.Remove(membro);
-        await db.SaveChangesAsync();
+                await _context
+                    .Membros
+                    .AddAsync(
+                        membro
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+
+                return membro;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<
+            Membro
+        > FindById(
+            int id
+        )
+        {
+            try
+            {
+                var membro =
+                    await _context
+                    .Membros
+                    .FirstOrDefaultAsync(
+                        x =>
+                        x.Id
+                        ==
+                        id
+                    );
+
+                if (membro is null)
+                {
+                    throw new ErrorServiceException(
+                        "Membro não encontrado",
+
+                        c =>
+                        c.NotFound(
+                            new
+                            {
+                                message =
+                                $"Membro #{id} não encontrado"
+                            }
+                        )
+                    );
+                }
+
+                return membro;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task
+        Remove(
+            int id
+        )
+        {
+            try
+            {
+                var membro =
+                    await FindById(id);
+
+                _context
+                    .Membros
+                    .Remove(
+                        membro
+                    );
+
+                await _context
+                    .SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
 }

@@ -1,23 +1,19 @@
-namespace BiblioSystem.Dtos.Membro;
+using System.ComponentModel.DataAnnotations;
 
-public record MembroCreateDto(
-    string Nome,
-    string Cpf,
-    string Email,
-    string Telefone
-);
+namespace BiblioSystem.Dtos
+{
+    public class MembroDto
+    {
+        [Required]
+        public required string NomeCompleto { get; set; }
 
-public record MembroUpdateDto(
-    string Nome,
-    string Email,
-    string Telefone
-);
+        [Required]
+        public required string CPF { get; set; }
 
-public record MembroResponseDto(
-    int IdMembro,
-    string Nome,
-    string Cpf,
-    string Email,
-    string Telefone,
-    DateOnly DataCadastro
-);
+        [Required]
+        public required string Email { get; set; }
+
+        [Required]
+        public required string Telefone { get; set; }
+    }
+}

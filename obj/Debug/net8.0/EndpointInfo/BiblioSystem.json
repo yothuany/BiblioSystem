@@ -1,11 +1,43 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "BiblioSystem",
-    "version": "1.0"
+    "title": "Biblioteca API",
+    "description": "API Sistema Biblioteca",
+    "version": "v1"
   },
   "paths": {
-    "/api/Autor": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/autores": {
       "get": {
         "tags": [
           "Autor"
@@ -24,17 +56,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorCreateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorCreateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorCreateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             }
           }
@@ -46,19 +78,37 @@
         }
       }
     },
-    "/api/Autor/{id}": {
+    "/autores/v2": {
       "get": {
         "tags": [
           "Autor"
         ],
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
             "schema": {
               "type": "integer",
-              "format": "int32"
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 5
             }
           }
         ],
@@ -67,7 +117,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/autores/{id}": {
       "put": {
         "tags": [
           "Autor"
@@ -87,17 +139,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorUpdateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorUpdateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/AutorUpdateDto"
+                "$ref": "#/components/schemas/AutorDto"
               }
             }
           }
@@ -130,7 +182,7 @@
         }
       }
     },
-    "/api/Categoria": {
+    "/categorias": {
       "get": {
         "tags": [
           "Categoria"
@@ -149,17 +201,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaCreateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaCreateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaCreateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             }
           }
@@ -171,7 +223,7 @@
         }
       }
     },
-    "/api/Categoria/{id}": {
+    "/categorias/{id}": {
       "get": {
         "tags": [
           "Categoria"
@@ -212,17 +264,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaUpdateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaUpdateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/CategoriaUpdateDto"
+                "$ref": "#/components/schemas/CategoriaDto"
               }
             }
           }
@@ -255,17 +307,7 @@
         }
       }
     },
-    "/api/Emprestimo": {
-      "get": {
-        "tags": [
-          "Emprestimo"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/emprestimos": {
       "post": {
         "tags": [
           "Emprestimo"
@@ -274,17 +316,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmprestimoCreateDto"
+                "$ref": "#/components/schemas/EmprestimoDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/EmprestimoCreateDto"
+                "$ref": "#/components/schemas/EmprestimoDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/EmprestimoCreateDto"
+                "$ref": "#/components/schemas/EmprestimoDto"
               }
             }
           }
@@ -296,30 +338,7 @@
         }
       }
     },
-    "/api/Emprestimo/{id}": {
-      "get": {
-        "tags": [
-          "Emprestimo"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Emprestimo/{id}/devolver": {
+    "/emprestimos/{id}/devolucao": {
       "patch": {
         "tags": [
           "Emprestimo"
@@ -335,25 +354,6 @@
             }
           }
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmprestimoDevolucaoDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmprestimoDevolucaoDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/EmprestimoDevolucaoDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "OK"
@@ -361,10 +361,54 @@
         }
       }
     },
-    "/api/Exemplar": {
+    "/exemplares": {
       "get": {
         "tags": [
           "Exemplar"
+        ],
+        "parameters": [
+          {
+            "name": "Status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "LivroId",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32",
+              "default": 5
+            }
+          }
         ],
         "responses": {
           "200": {
@@ -380,17 +424,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarCreateDto"
+                "$ref": "#/components/schemas/ExemplarDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarCreateDto"
+                "$ref": "#/components/schemas/ExemplarDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarCreateDto"
+                "$ref": "#/components/schemas/ExemplarDto"
               }
             }
           }
@@ -402,8 +446,8 @@
         }
       }
     },
-    "/api/Exemplar/{id}": {
-      "get": {
+    "/exemplares/{id}/status": {
+      "patch": {
         "tags": [
           "Exemplar"
         ],
@@ -416,66 +460,12 @@
               "type": "integer",
               "format": "int32"
             }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Exemplar"
-        ],
-        "parameters": [
+          },
           {
-            "name": "id",
-            "in": "path",
-            "required": true,
+            "name": "status",
+            "in": "query",
             "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExemplarUpdateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExemplarUpdateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ExemplarUpdateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Exemplar"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string"
             }
           }
         ],
@@ -486,7 +476,7 @@
         }
       }
     },
-    "/api/Livro": {
+    "/livros": {
       "get": {
         "tags": [
           "Livro"
@@ -505,17 +495,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LivroCreateDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LivroCreateDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LivroCreateDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             }
           }
@@ -527,143 +517,7 @@
         }
       }
     },
-    "/api/Livro/{id}": {
-      "get": {
-        "tags": [
-          "Livro"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Livro"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LivroUpdateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LivroUpdateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LivroUpdateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "Livro"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Livro/catalogo": {
-      "get": {
-        "tags": [
-          "Livro"
-        ],
-        "parameters": [
-          {
-            "name": "titulo",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "autor",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "categoria",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "editora",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Membro": {
-      "get": {
-        "tags": [
-          "Membro"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/membros": {
       "post": {
         "tags": [
           "Membro"
@@ -672,17 +526,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/MembroCreateDto"
+                "$ref": "#/components/schemas/MembroDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/MembroCreateDto"
+                "$ref": "#/components/schemas/MembroDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/MembroCreateDto"
+                "$ref": "#/components/schemas/MembroDto"
               }
             }
           }
@@ -694,68 +548,7 @@
         }
       }
     },
-    "/api/Membro/{id}": {
-      "get": {
-        "tags": [
-          "Membro"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Membro"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MembroUpdateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/MembroUpdateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/MembroUpdateDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/membros/{id}": {
       "delete": {
         "tags": [
           "Membro"
@@ -778,17 +571,7 @@
         }
       }
     },
-    "/api/Reserva": {
-      "get": {
-        "tags": [
-          "Reserva"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/reservas": {
       "post": {
         "tags": [
           "Reserva"
@@ -797,17 +580,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReservaCreateDto"
+                "$ref": "#/components/schemas/ReservaDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReservaCreateDto"
+                "$ref": "#/components/schemas/ReservaDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ReservaCreateDto"
+                "$ref": "#/components/schemas/ReservaDto"
               }
             }
           }
@@ -819,30 +602,7 @@
         }
       }
     },
-    "/api/Reserva/{id}": {
-      "get": {
-        "tags": [
-          "Reserva"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Reserva/{id}/cancelar": {
+    "/reservas/{id}/cancelar": {
       "patch": {
         "tags": [
           "Reserva"
@@ -865,7 +625,7 @@
         }
       }
     },
-    "/api/Usuario/login": {
+    "/usuarios": {
       "post": {
         "tags": [
           "Usuario"
@@ -874,48 +634,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginDto"
+                "$ref": "#/components/schemas/UsuarioDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginDto"
+                "$ref": "#/components/schemas/UsuarioDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/LoginDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/Usuario/registrar": {
-      "post": {
-        "tags": [
-          "Usuario"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UsuarioCreateDto"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UsuarioCreateDto"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UsuarioCreateDto"
+                "$ref": "#/components/schemas/UsuarioDto"
               }
             }
           }
@@ -930,70 +659,55 @@
   },
   "components": {
     "schemas": {
-      "AutorCreateDto": {
+      "AutorDto": {
+        "required": [
+          "biografia",
+          "nome"
+        ],
         "type": "object",
         "properties": {
           "nome": {
-            "type": "string",
-            "nullable": true
+            "minLength": 3,
+            "type": "string"
           },
           "biografia": {
-            "type": "string",
-            "nullable": true
+            "minLength": 10,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "AutorUpdateDto": {
+      "CategoriaDto": {
+        "required": [
+          "descricao",
+          "nome"
+        ],
         "type": "object",
         "properties": {
           "nome": {
-            "type": "string",
-            "nullable": true
-          },
-          "biografia": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "CategoriaCreateDto": {
-        "type": "object",
-        "properties": {
-          "nome": {
-            "type": "string",
-            "nullable": true
+            "minLength": 3,
+            "type": "string"
           },
           "descricao": {
-            "type": "string",
-            "nullable": true
+            "minLength": 5,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "CategoriaUpdateDto": {
+      "EmprestimoDto": {
+        "required": [
+          "dataPrevistaDevolucao",
+          "exemplarId",
+          "membroId"
+        ],
         "type": "object",
         "properties": {
-          "nome": {
-            "type": "string",
-            "nullable": true
-          },
-          "descricao": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "EmprestimoCreateDto": {
-        "type": "object",
-        "properties": {
-          "membroIdMembro": {
+          "membroId": {
             "type": "integer",
             "format": "int32"
           },
-          "exemplarIdExemplar": {
+          "exemplarId": {
             "type": "integer",
             "format": "int32"
           },
@@ -1004,141 +718,123 @@
         },
         "additionalProperties": false
       },
-      "EmprestimoDevolucaoDto": {
+      "ExemplarDto": {
+        "required": [
+          "codigoExemplar",
+          "livroId"
+        ],
         "type": "object",
         "properties": {
-          "dataDevolucao": {
-            "type": "string",
-            "format": "date"
-          }
-        },
-        "additionalProperties": false
-      },
-      "ExemplarCreateDto": {
-        "type": "object",
-        "properties": {
-          "codigo": {
-            "type": "string",
-            "nullable": true
+          "codigoExemplar": {
+            "minLength": 1,
+            "type": "string"
           },
-          "livroIdLivro": {
+          "livroId": {
             "type": "integer",
             "format": "int32"
           }
         },
         "additionalProperties": false
       },
-      "ExemplarUpdateDto": {
-        "type": "object",
-        "properties": {
-          "codigo": {
-            "type": "string",
-            "nullable": true
-          },
-          "status": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LivroCreateDto": {
+      "LivroDto": {
+        "required": [
+          "anoPublicacao",
+          "categoriaId",
+          "editora",
+          "isbn",
+          "titulo"
+        ],
         "type": "object",
         "properties": {
           "titulo": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "isbn": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "anoPublicacao": {
             "type": "integer",
             "format": "int32"
           },
           "editora": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
-          "autorIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          },
-          "categoriaIds": {
-            "type": "array",
-            "items": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "LivroUpdateDto": {
-        "type": "object",
-        "properties": {
-          "titulo": {
-            "type": "string",
-            "nullable": true
-          },
-          "isbn": {
-            "type": "string",
-            "nullable": true
-          },
-          "anoPublicacao": {
+          "categoriaId": {
             "type": "integer",
             "format": "int32"
-          },
-          "editora": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "LoginDto": {
+        "required": [
+          "email",
+          "password"
+        ],
         "type": "object",
         "properties": {
           "email": {
+            "minLength": 1,
             "type": "string",
-            "nullable": true
+            "format": "email"
           },
-          "senha": {
-            "type": "string",
-            "nullable": true
+          "password": {
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "MembroCreateDto": {
+      "MembroDto": {
+        "required": [
+          "cpf",
+          "email",
+          "nomeCompleto",
+          "telefone"
+        ],
         "type": "object",
         "properties": {
-          "nome": {
-            "type": "string",
-            "nullable": true
+          "nomeCompleto": {
+            "minLength": 1,
+            "type": "string"
           },
           "cpf": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "telefone": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
-      "MembroUpdateDto": {
+      "ReservaDto": {
+        "required": [
+          "livroId",
+          "membroId"
+        ],
+        "type": "object",
+        "properties": {
+          "membroId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "livroId": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UsuarioDto": {
         "type": "object",
         "properties": {
           "nome": {
@@ -1149,45 +845,26 @@
             "type": "string",
             "nullable": true
           },
-          "telefone": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "ReservaCreateDto": {
-        "type": "object",
-        "properties": {
-          "membroIdMembro": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "livroIdLivro": {
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
-      "UsuarioCreateDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "nullable": true
-          },
           "senha": {
             "type": "string",
             "nullable": true
-          },
-          "membroIdMembro": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "Bearer {token}",
+        "name": "Authorization",
+        "in": "header"
+      }
     }
-  }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
 }

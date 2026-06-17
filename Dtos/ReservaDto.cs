@@ -1,13 +1,14 @@
-namespace BiblioSystem.Dtos.Reserva;
+using System.ComponentModel.DataAnnotations;
 
-public record ReservaCreateDto(int MembroIdMembro, int LivroIdLivro);
+namespace BiblioSystem.Dtos
+{
+    public class ReservaDto
+    {
+        [Required]
+        public int MembroId { get; set; }
 
-public record ReservaResponseDto(
-    int IdReserva,
-    DateOnly DataReserva,
-    string Status,
-    int MembroIdMembro,
-    string NomeMembro,
-    int LivroIdLivro,
-    string TituloLivro
-);
+
+        [Required]
+        public int LivroId { get; set; }
+    }
+}

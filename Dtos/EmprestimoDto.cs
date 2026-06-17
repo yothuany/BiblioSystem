@@ -1,21 +1,16 @@
-namespace BiblioSystem.Dtos.Emprestimo;
+using System.ComponentModel.DataAnnotations;
 
-public record EmprestimoCreateDto(
-    int MembroIdMembro,
-    int ExemplarIdExemplar,
-    DateOnly DataPrevistaDevolucao
-);
+namespace BiblioSystem.Dtos
+{
+    public class EmprestimoDto
+    {
+        [Required]
+        public int MembroId { get; set; }
 
-public record EmprestimoDevolucaoDto(DateOnly DataDevolucao);
+        [Required]
+        public int ExemplarId { get; set; }
 
-public record EmprestimoResponseDto(
-    int IdEmprestimo,
-    DateOnly DataEmprestimo,
-    DateOnly DataPrevistaDevolucao,
-    DateOnly? DataDevolucao,
-    decimal ValorMulta,
-    int MembroIdMembro,
-    string NomeMembro,
-    int ExemplarIdExemplar,
-    string CodigoExemplar
-);
+        [Required]
+        public DateOnly DataPrevistaDevolucao { get; set; }
+    }
+}

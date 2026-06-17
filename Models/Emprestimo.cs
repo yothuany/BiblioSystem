@@ -1,16 +1,27 @@
-namespace BiblioSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
-public class Emprestimo
+namespace BiblioSystem.Models
 {
-    public int IdEmprestimo { get; set; }
-    public DateOnly DataEmprestimo { get; set; }
-    public DateOnly DataPrevistaDevolucao { get; set; }
-    public DateOnly? DataDevolucao { get; set; }
-    public decimal ValorMulta { get; set; } = 0;
+    [Table("emprestimos"), PrimaryKey(nameof(Id))]
+    public class Emprestimo
+    {
+        public int Id { get; set; }
 
-    public int MembroIdMembro { get; set; }
-    public Membro Membro { get; set; } = null!;
+        public int MembroId { get; set; }
 
-    public int ExemplarIdExemplar { get; set; }
-    public Exemplar Exemplar { get; set; } = null!;
+        public virtual Membro? Membro { get; set; }
+
+        public int ExemplarId { get; set; }
+
+        public virtual Exemplar? Exemplar { get; set; }
+
+        public DateOnly DataEmprestimo { get; set; }
+
+        public DateOnly DataPrevistaDevolucao { get; set; }
+
+        public DateOnly? DataDevolucao { get; set; }
+
+        public decimal Multa { get; set; }
+    }
 }
