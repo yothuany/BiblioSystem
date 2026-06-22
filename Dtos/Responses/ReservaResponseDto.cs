@@ -8,8 +8,12 @@ namespace BiblioSystem.Dtos.Responses
 
         public required string Status { get; set; }
 
-        public LivroResponseDto? Livro { get; set; }
+        public int MembroId { get; set; }
 
-        public MembroResponseDto? Membro { get; set; }
+        public string? MembroNome { get; set; }
+
+        public int LivroId { get; set; }
+
+        public string? LivroTitulo { get; set; }
     }
 }

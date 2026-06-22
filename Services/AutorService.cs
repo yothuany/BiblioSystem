@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
 using BiblioSystem.Dtos;
@@ -14,79 +13,32 @@ namespace BiblioSystem.Services
     public class AutorService
     {
         private readonly AppDbContext _context;
-
         private readonly IMapper _mapper;
 
-        public AutorService(
-            AppDbContext context,
-            IMapper mapper
-        )
+        public AutorService(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<
-            ICollection<AutorResponseDto>
-        > FindAll()
+        public async Task<PaginatedResponse<AutorResponseDto>> FindAll(AutorFilter filter)
         {
             try
             {
-                return await _context
-                    .Autores
-                    .ProjectTo<
-                        AutorResponseDto
-                    >(
-                        _mapper.ConfigurationProvider
-                    )
-                    .ToListAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
+                var query = _context.Autor.AsQueryable();
 
-        public async Task<
-            PaginatedResponse<
-                AutorResponseDto
-            >
-        > FindAllV2(
-            AutorFilter filter
-        )
-        {
-            try
-            {
-                var query =
-                    _context
-                    .Autores
-                    .AsQueryable();
-
-                if (
-                    filter.Search
-                    is not null
-                )
+                if (filter.Search is not null)
                 {
-                    query =
-                        query
-                        .Where(
-                            x =>
-                            x.Nome
-                            .Contains(
-                                filter.Search
-                            )
-                        );
+                    if (int.TryParse(filter.Search, out int idBuscado))
+                    {
+                        query = query.Where(x => x.Id == idBuscado);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Nome.Contains(filter.Search));
+                    }
                 }
-
-                return await
-                    Paginate<Autor>
-                    .Set<
-                        AutorResponseDto
-                    >(
-                        query,
-                        filter,
-                        _mapper
-                    );
+                return await Paginate<Autor>.Set<AutorResponseDto>(query, filter, _mapper);
             }
             catch (Exception)
             {
@@ -94,28 +46,14 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Autor
-        > Create(
-            AutorDto data
-        )
+        public async Task<Autor> Create(AutorDto data)
         {
             try
             {
-                var autor =
-                    _mapper
-                    .Map<Autor>(
-                        data
-                    );
+                var autor = _mapper.Map<Autor>(data);
 
-                await _context
-                    .Autores
-                    .AddAsync(
-                        autor
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                await _context.Autor.AddAsync(autor);
+                await _context.SaveChangesAsync();
 
                 return autor;
             }
@@ -125,41 +63,16 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Autor
-        > FindById(
-            int id
-        )
+        public async Task<Autor> FindById(int id)
         {
             try
             {
-                var autor =
-                    await _context
-                    .Autores
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        id
-                    );
+                var autor = await _context.Autor.FirstOrDefaultAsync(x => x.Id == id);
 
-                if (
-                    autor
-                    is null
-                )
+                if (autor is null)
                 {
-                    throw new ErrorServiceException(
-                        "Autor não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Autor #{id} não encontrado"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Autor {id} não encontrado",
+                        c => c.NotFound(new { message = $"Autor #{id} não encontrado" }));
                 }
 
                 return autor;
@@ -170,33 +83,16 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Autor
-        > Update(
-            int id,
-            AutorDto data
-        )
+        public async Task<Autor> Update(int id, AutorDto data)
         {
             try
             {
-                var autor =
-                    await FindById(
-                        id
-                    );
+                var autor = await FindById(id);
 
-                _mapper.Map(
-                    data,
-                    autor
-                );
+                _mapper.Map(data, autor);
 
-                _context
-                    .Autores
-                    .Update(
-                        autor
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                _context.Autor.Update(autor);
+                await _context.SaveChangesAsync();
 
                 return autor;
             }
@@ -205,26 +101,23 @@ namespace BiblioSystem.Services
                 throw;
             }
         }
-
-        public async Task Remove(
-            int id
-        )
+        public async Task Remove(int id)
         {
             try
             {
-                var autor =
-                    await FindById(
-                        id
-                    );
+                var autor = await FindById(id);
 
-                _context
-                    .Autores
-                    .Remove(
-                        autor
-                    );
+                var possuiLivros = await _context.Livro
+                    .AnyAsync(l => l.Autores.Any(a => a.Id == id));
 
-                await _context
-                    .SaveChangesAsync();
+                if (possuiLivros)
+                {
+                    throw new ErrorServiceException($"Não é possível remover o autor porque ele possui livros vinculados.",
+                        c => c.BadRequest(new { message = $"O autor '{autor.Nome}' não pode ser removido porque está vinculado a um ou mais livros." }));
+                }
+
+                _context.Autor.Remove(autor);
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {

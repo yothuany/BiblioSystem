@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
 using BiblioSystem.Dtos;
@@ -8,70 +7,43 @@ using BiblioSystem.Exceptions;
 using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BiblioSystem.Services
 {
     public class ExemplarService
     {
         private readonly AppDbContext _context;
-
         private readonly IMapper _mapper;
 
-        public ExemplarService(
-            AppDbContext context,
-            IMapper mapper
-        )
+        public ExemplarService(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<
-            PaginatedResponse<
-                ExemplarResponseDto
-            >
-        > FindAllV2(
-            ExemplarFilter filter
-        )
+        public async Task<PaginatedResponse<ExemplarResponseDto>> FindAll(ExemplarFilter filter)
         {
             try
             {
-                var query =
-                    _context
-                    .Exemplares
-                    .AsQueryable();
+                var query = _context.Exemplar.Include(x => x.Livro).AsQueryable();
 
-                if (filter.Status is not null)
+                if (filter.Search is not null)
                 {
-                    query =
-                        query.Where(
-                            x =>
-                            x.Status
-                            ==
-                            filter.Status
-                        );
+                    if (int.TryParse(filter.Search, out int idBuscado))
+                    {
+                        query = query.Where(x => x.Id == idBuscado);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Codigo.Contains(filter.Search) ||
+                                                 x.Status.Contains(filter.Search) ||
+                                                 x.Livro!.Isbn.Contains(filter.Search));
+                    }
                 }
-
-                if (filter.LivroId is not null)
-                {
-                    query =
-                        query.Where(
-                            x =>
-                            x.LivroId
-                            ==
-                            filter.LivroId
-                        );
-                }
-
-                return await
-                    Paginate<Exemplar>
-                    .Set<
-                        ExemplarResponseDto
-                    >(
-                        query,
-                        filter,
-                        _mapper
-                    );
+                return await Paginate<Exemplar>.Set<ExemplarResponseDto>(query, filter, _mapper);
             }
             catch (Exception)
             {
@@ -79,54 +51,26 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Exemplar
-        > Create(
-            ExemplarDto data
-        )
+        public async Task<Exemplar> Create(ExemplarDto data)
         {
             try
             {
-                var livro =
-                    await _context
-                    .Livros
-                    .AnyAsync(
-                        x =>
-                        x.Id
-                        ==
-                        data.LivroId
-                    );
-
-                if (!livro)
+                var livro = await _context.Livro.FirstOrDefaultAsync(l => l.Isbn == data.IsbnLivro);
+                if (livro is null)
                 {
-                    throw new ErrorServiceException(
-                        "Livro não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                "Livro inválido"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Livro com ISBN {data.IsbnLivro} não encontrado",
+                        c => c.BadRequest(new { message = $"Não é possível cadastrar o exemplar: Livro com ISBN {data.IsbnLivro} não existe." }));
                 }
 
-                var exemplar =
-                    _mapper
-                    .Map<Exemplar>(
-                        data
-                    );
+                var exemplar = new Exemplar
+                {
+                    Codigo = data.Codigo,
+                    LivroId = livro.Id,
+                    Status = "Disponível"
+                };
 
-                await _context
-                    .Exemplares
-                    .AddAsync(
-                        exemplar
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                await _context.Exemplar.AddAsync(exemplar);
+                await _context.SaveChangesAsync();
 
                 return exemplar;
             }
@@ -136,38 +80,16 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Exemplar
-        > FindById(
-            int id
-        )
+        public async Task<Exemplar> FindById(int id)
         {
             try
             {
-                var exemplar =
-                    await _context
-                    .Exemplares
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        id
-                    );
+                var exemplar = await _context.Exemplar.Include(x => x.Livro).FirstOrDefaultAsync(x => x.Id == id);
 
                 if (exemplar is null)
                 {
-                    throw new ErrorServiceException(
-                        "Exemplar não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Exemplar #{id} não encontrado"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Exemplar {id} não encontrado",
+                        c => c.NotFound(new { message = $"Exemplar #{id} não encontrado" }));
                 }
 
                 return exemplar;
@@ -178,25 +100,47 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Exemplar
-        > UpdateStatus(
-            int id,
-            string status
-        )
+        public async Task<Exemplar> Update(int id, ExemplarDto data)
         {
             try
             {
-                var exemplar =
-                    await FindById(id);
+                var exemplar = await FindById(id);
 
-                exemplar.Status =
-                    status;
+                var livro = await _context.Livro.FirstOrDefaultAsync(l => l.Isbn == data.IsbnLivro);
+                if (livro is null)
+                {
+                    throw new ErrorServiceException($"Livro com ISBN {data.IsbnLivro} não encontrado",
+                        c => c.BadRequest(new { message = $"Não é possível atualizar o exemplar: Livro com ISBN {data.IsbnLivro} não existe." }));
+                }
 
-                await _context
-                    .SaveChangesAsync();
+                exemplar.Codigo = data.Codigo;
+                exemplar.LivroId = livro.Id;
+
+                _context.Exemplar.Update(exemplar);
+                await _context.SaveChangesAsync();
 
                 return exemplar;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task Remove(int id)
+        {
+            try
+            {
+                var exemplar = await FindById(id);
+
+                if (exemplar.Status == "Emprestado")
+                {
+                    throw new ErrorServiceException($"Não é possível remover o exemplar porque ele está emprestado.",
+                        c => c.BadRequest(new { message = $"O exemplar código '{exemplar.Codigo}' não pode ser removido pois está com o status 'Emprestado'." }));
+                }
+
+                _context.Exemplar.Remove(exemplar);
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {

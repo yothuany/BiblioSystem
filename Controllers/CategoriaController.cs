@@ -1,13 +1,14 @@
+using BiblioSystem.Controllers.Filters;
 using BiblioSystem.Dtos;
-using BiblioSystem.Exceptions;
 using BiblioSystem.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using BiblioSystem.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BiblioSystem.Controllers
 {
-    [Route("/categorias")]
     [ApiController]
+    [Route("categoria")]
     [Authorize]
     public class CategoriaController : ControllerBase
     {
@@ -17,27 +18,22 @@ namespace BiblioSystem.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// Listagem de categorias, busca por ID ou nome, paginação e ordenação.
+        /// </summary>
 
-        [HttpGet()]
-        public async Task<IActionResult> FindAll()
+        // GET: /categoria/Consultar
+        [HttpGet("Consultar")]
+        public async Task<IActionResult> FindAll([FromQuery] CategoriaFilter filter)
         {
             try
             {
-                var categorias = await _service.FindAll();
-                return Ok(categorias);
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
-            }
-        }
+                var categoria = await _service.FindAll(filter);
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> FindById(int id)
-        {
-            try
-            {
-                var categoria = await _service.FindById(id);
+                if (categoria.Data == null || !categoria.Data.Any())
+                {
+                    return Ok(new { mensagem = "Nenhuma categoria encontrada.", dados = categoria });
+                }
                 return Ok(categoria);
             }
             catch (ErrorServiceException e)
@@ -50,27 +46,14 @@ namespace BiblioSystem.Controllers
             }
         }
 
-        [HttpPost()]
+        // POST: /categoria/Cadastrar
+        [HttpPost("Cadastrar")]
         public async Task<IActionResult> Create([FromBody] CategoriaDto novaCategoria)
         {
             try
             {
                 var categoria = await _service.Create(novaCategoria);
-                return Created("", categoria);
-            }
-            catch (Exception e)
-            {
-                return Problem(e.Message);
-            }
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] CategoriaDto categoriaDto)
-        {
-            try
-            {
-                var categoria = await _service.Update(id, categoriaDto);
-                return Ok(categoria);
+                return Created("", new { mensagem = "Categoria cadastrada com sucesso!", dados = categoria });
             }
             catch (ErrorServiceException e)
             {
@@ -82,13 +65,37 @@ namespace BiblioSystem.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Remove(int id)
+        // PUT: /categoria/Editar/{id}
+        [HttpPut("Editar/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoriaDto categoriaDto)
+        {
+            try
+            {
+                var categoria = await _service.Update(id, categoriaDto);
+                return Ok(new { mensagem = "Categoria atualizada com sucesso!", dados = categoria });
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
+        }
+
+        // DELETE: /categoria/Remover/{id}
+        [HttpDelete("Remover/{id}")]
+        public async Task<IActionResult> Remove(int id)
         {
             try
             {
                 await _service.Remove(id);
-                return NoContent();
+                return Ok(new { mensagem = "Categoria removida com sucesso!" });
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
             }
             catch (Exception e)
             {

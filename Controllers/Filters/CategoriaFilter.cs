@@ -2,8 +2,7 @@
 
 namespace BiblioSystem.Controllers.Filters
 {
-    public class CategoriaFilter
-        : PaginatedFilter
+    public class CategoriaFilter : PaginatedFilter
     {
     }
 }

@@ -1,93 +1,108 @@
-using BiblioSystem.Controllers.Filters;
+﻿using BiblioSystem.Controllers.Filters;
 using BiblioSystem.Dtos;
+using BiblioSystem.Models;
 using BiblioSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using BiblioSystem.Exceptions;
 
 namespace BiblioSystem.Controllers
 {
     [ApiController]
-    [Route("autores")]
-    [Authorize]
+    [Route("autor")]
+   // [Authorize]
     public class AutorController : ControllerBase
     {
         private readonly AutorService _service;
 
-        public AutorController(
-            AutorService service
-        )
+        public AutorController(AutorService service)
         {
             _service = service;
         }
 
-        [HttpGet]
-        public async Task<IActionResult>
-        FindAll()
+        /// <summary>
+        /// Listagem de autores, busca por ID ou nome, paginação e ordenação.
+        /// </summary>
+      
+        // GET: /autor/Consultar
+        [HttpGet("Consultar")]
+        public async Task<IActionResult> FindAll([FromQuery] AutorFilter filter)
         {
-            return Ok(
-                await _service
-                .FindAll()
-            );
+            try
+            {
+                var autor = await _service.FindAll(filter);
+
+                if (autor.Data == null || !autor.Data.Any())
+                {
+                    return Ok(new { mensagem = "Nenhum autor encontrado.", dados = autor });
+                }
+                return Ok(autor);
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
         }
 
-        [HttpGet("v2")]
-        public async Task<IActionResult>
-        FindAllV2(
-            [FromQuery]
-            AutorFilter filter
-        )
+        // POST: /autor/Cadastrar
+        [HttpPost("Cadastrar")]
+        public async Task<IActionResult> Create([FromBody] AutorDto novoAutor)
         {
-            return Ok(
-                await _service
-                .FindAllV2(
-                    filter
-                )
-            );
+            try
+            {
+                var autor = await _service.Create(novoAutor);
+                return Created("", new { mensagem = "Autor cadastrado com sucesso!", dados = autor });
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
         }
 
-        [HttpPost]
-        public async Task<IActionResult>
-        Create(
-            AutorDto data
-        )
+        // POST: /autor/Editar
+        [HttpPut("Editar/{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] AutorDto autorDto)
         {
-            return Created(
-                "",
-                await _service
-                .Create(
-                    data
-                )
-            );
+            try
+            {
+                var autor = await _service.Update(id, autorDto);
+                return Ok(new { mensagem = "Autor atualizado com sucesso!", dados = autor });
+            }
+            catch (ErrorServiceException e)
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult>
-        Update(
-            int id,
-            AutorDto data
-        )
+        // DELETE: /autor/Remover
+        [HttpDelete("Remover/{id}")]
+        public async Task<IActionResult> Remove( int id)
         {
-            return Ok(
-                await _service
-                .Update(
-                    id,
-                    data
-                )
-            );
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult>
-        Remove(
-            int id
-        )
-        {
-            await _service
-                .Remove(
-                    id
-                );
-
-            return NoContent();
+            try
+            {
+                await _service.Remove(id);
+                return Ok(new { mensagem = "Autor removido com sucesso!" });
+            }
+            catch (ErrorServiceException e) 
+            {
+                return e.ToActionResult(this);
+            }
+            catch (Exception e)
+            {
+                return Problem(e.Message);
+            }
         }
     }
 }

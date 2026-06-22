@@ -6,11 +6,12 @@
     "version": "v1"
   },
   "paths": {
-    "/auth/login": {
+    "/auth/Login": {
       "post": {
         "tags": [
           "Auth"
         ],
+        "summary": "Realiza o login do usuário e retorna o Token JWT.",
         "requestBody": {
           "content": {
             "application/json": {
@@ -37,17 +38,49 @@
         }
       }
     },
-    "/autores": {
+    "/autor/Consultar": {
       "get": {
         "tags": [
           "Autor"
+        ],
+        "summary": "Listagem de autores, busca por ID ou nome, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/autor/Cadastrar": {
       "post": {
         "tags": [
           "Autor"
@@ -78,48 +111,7 @@
         }
       }
     },
-    "/autores/v2": {
-      "get": {
-        "tags": [
-          "Autor"
-        ],
-        "parameters": [
-          {
-            "name": "Search",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "Page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1
-            }
-          },
-          {
-            "name": "Limit",
-            "in": "query",
-            "schema": {
-              "maximum": 20,
-              "minimum": 1,
-              "type": "integer",
-              "format": "int32",
-              "default": 5
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/autores/{id}": {
+    "/autor/Editar/{id}": {
       "put": {
         "tags": [
           "Autor"
@@ -159,7 +151,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/autor/Remover/{id}": {
       "delete": {
         "tags": [
           "Autor"
@@ -182,17 +176,49 @@
         }
       }
     },
-    "/categorias": {
+    "/categoria/Consultar": {
       "get": {
         "tags": [
           "Categoria"
+        ],
+        "summary": "Listagem de categorias, busca por ID ou nome, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
         ],
         "responses": {
           "200": {
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/categoria/Cadastrar": {
       "post": {
         "tags": [
           "Categoria"
@@ -223,28 +249,7 @@
         }
       }
     },
-    "/categorias/{id}": {
-      "get": {
-        "tags": [
-          "Categoria"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
+    "/categoria/Editar/{id}": {
       "put": {
         "tags": [
           "Categoria"
@@ -284,7 +289,9 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/categoria/Remover/{id}": {
       "delete": {
         "tags": [
           "Categoria"
@@ -307,7 +314,49 @@
         }
       }
     },
-    "/emprestimos": {
+    "/emprestimo/Consultar": {
+      "get": {
+        "tags": [
+          "Emprestimo"
+        ],
+        "summary": "Listagem de empréstimos. Busca por ID, status, código do exemplar, nome ou CPF do membro, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/emprestimo/Cadastrar": {
       "post": {
         "tags": [
           "Emprestimo"
@@ -338,8 +387,8 @@
         }
       }
     },
-    "/emprestimos/{id}/devolucao": {
-      "patch": {
+    "/emprestimo/Devolver/{id}": {
+      "put": {
         "tags": [
           "Emprestimo"
         ],
@@ -361,25 +410,179 @@
         }
       }
     },
-    "/exemplares": {
+    "/emprestimo/Remove/{id}": {
+      "delete": {
+        "tags": [
+          "Emprestimo"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/exemplar/Consultar": {
       "get": {
         "tags": [
           "Exemplar"
         ],
+        "summary": "Listagem de exemplares, busca por ID, código ou status, paginação e ordenação.",
         "parameters": [
           {
-            "name": "Status",
+            "name": "Search",
             "in": "query",
             "schema": {
               "type": "string"
             }
           },
           {
-            "name": "LivroId",
+            "name": "Page",
             "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
             "schema": {
               "type": "integer",
               "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/exemplar/Cadastrar": {
+      "post": {
+        "tags": [
+          "Exemplar"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/exemplar/Editar/{id}": {
+      "put": {
+        "tags": [
+          "Exemplar"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExemplarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/exemplar/Remover/{id}": {
+      "delete": {
+        "tags": [
+          "Exemplar"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/livro/Consultar": {
+      "get": {
+        "tags": [
+          "Livro"
+        ],
+        "summary": "Listagem de livros, busca por ID, título, ISBN ou autor, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Autor",
+            "in": "query",
+            "schema": {
+              "type": "string"
             }
           },
           {
@@ -392,21 +595,21 @@
           {
             "name": "Page",
             "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
             "schema": {
               "type": "integer",
-              "format": "int32",
-              "default": 1
+              "format": "int32"
             }
           },
           {
             "name": "Limit",
             "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
             "schema": {
               "maximum": 20,
               "minimum": 1,
               "type": "integer",
-              "format": "int32",
-              "default": 5
+              "format": "int32"
             }
           }
         ],
@@ -415,26 +618,28 @@
             "description": "OK"
           }
         }
-      },
+      }
+    },
+    "/livro/Cadastrar": {
       "post": {
         "tags": [
-          "Exemplar"
+          "Livro"
         ],
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/ExemplarDto"
+                "$ref": "#/components/schemas/LivroDto"
               }
             }
           }
@@ -446,10 +651,10 @@
         }
       }
     },
-    "/exemplares/{id}/status": {
-      "patch": {
+    "/livro/Editar/{id}": {
+      "put": {
         "tags": [
-          "Exemplar"
+          "Livro"
         ],
         "parameters": [
           {
@@ -460,36 +665,7 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
           }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/livros": {
-      "get": {
-        "tags": [
-          "Livro"
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Livro"
         ],
         "requestBody": {
           "content": {
@@ -517,7 +693,72 @@
         }
       }
     },
-    "/membros": {
+    "/livro/Remover/{id}": {
+      "delete": {
+        "tags": [
+          "Livro"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/membro/Consultar": {
+      "get": {
+        "tags": [
+          "Membro"
+        ],
+        "summary": "Listagem de membros, busca por ID, nome, e-mail ou CPF, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/membro/Cadastrar": {
       "post": {
         "tags": [
           "Membro"
@@ -548,7 +789,49 @@
         }
       }
     },
-    "/membros/{id}": {
+    "/membro/Editar/{id}": {
+      "put": {
+        "tags": [
+          "Membro"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembroDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembroDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembroDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/membro/Remover/{id}": {
       "delete": {
         "tags": [
           "Membro"
@@ -571,7 +854,49 @@
         }
       }
     },
-    "/reservas": {
+    "/reserva/Consultar": {
+      "get": {
+        "tags": [
+          "Reserva"
+        ],
+        "summary": "Listagem de reservas, busca por ID, status, livro ou membro, paginação e ordenação.",
+        "parameters": [
+          {
+            "name": "Search",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "O número da página que você deseja visualizar (Começa em 1).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Quantidade de registros exibidos por página.",
+            "schema": {
+              "maximum": 20,
+              "minimum": 1,
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/reserva/Cadastrar": {
       "post": {
         "tags": [
           "Reserva"
@@ -602,8 +927,8 @@
         }
       }
     },
-    "/reservas/{id}/cancelar": {
-      "patch": {
+    "/reserva/Cancelar/{id}": {
+      "put": {
         "tags": [
           "Reserva"
         ],
@@ -625,7 +950,42 @@
         }
       }
     },
-    "/usuarios": {
+    "/reserva/Remove/{id}": {
+      "delete": {
+        "tags": [
+          "Reserva"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/usuarios/Consultar": {
+      "get": {
+        "tags": [
+          "Usuario"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/usuarios/Cadastrar": {
       "post": {
         "tags": [
           "Usuario"
@@ -649,6 +1009,69 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/usuarios/Editar": {
+      "put": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioUpdateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioUpdateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UsuarioUpdateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/usuarios/Remover": {
+      "delete": {
+        "tags": [
+          "Usuario"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -679,7 +1102,6 @@
       },
       "CategoriaDto": {
         "required": [
-          "descricao",
           "nome"
         ],
         "type": "object",
@@ -689,43 +1111,47 @@
             "type": "string"
           },
           "descricao": {
-            "minLength": 5,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
       },
       "EmprestimoDto": {
         "required": [
-          "dataPrevistaDevolucao",
-          "exemplarId",
-          "membroId"
+          "codigoExemplar",
+          "cpfMembro",
+          "diasDeEmprestimo"
         ],
         "type": "object",
         "properties": {
-          "membroId": {
+          "cpfMembro": {
+            "minLength": 1,
+            "pattern": "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$",
+            "type": "string"
+          },
+          "codigoExemplar": {
+            "maxLength": 50,
+            "minLength": 3,
+            "type": "string"
+          },
+          "diasDeEmprestimo": {
+            "maximum": 90,
+            "minimum": 1,
             "type": "integer",
             "format": "int32"
-          },
-          "exemplarId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "dataPrevistaDevolucao": {
-            "type": "string",
-            "format": "date"
           }
         },
         "additionalProperties": false
       },
       "ExemplarDto": {
         "required": [
-          "codigoExemplar",
+          "codigo",
           "livroId"
         ],
         "type": "object",
         "properties": {
-          "codigoExemplar": {
+          "codigo": {
             "minLength": 1,
             "type": "string"
           },
@@ -739,15 +1165,15 @@
       "LivroDto": {
         "required": [
           "anoPublicacao",
-          "categoriaId",
-          "editora",
+          "autoresIds",
+          "categoriasIds",
           "isbn",
           "titulo"
         ],
         "type": "object",
         "properties": {
           "titulo": {
-            "minLength": 1,
+            "minLength": 3,
             "type": "string"
           },
           "isbn": {
@@ -755,16 +1181,28 @@
             "type": "string"
           },
           "anoPublicacao": {
+            "maximum": 2100,
+            "minimum": 1,
             "type": "integer",
             "format": "int32"
           },
           "editora": {
-            "minLength": 1,
-            "type": "string"
+            "type": "string",
+            "nullable": true
           },
-          "categoriaId": {
-            "type": "integer",
-            "format": "int32"
+          "autoresIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "categoriasIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         },
         "additionalProperties": false
@@ -772,7 +1210,7 @@
       "LoginDto": {
         "required": [
           "email",
-          "password"
+          "senha"
         ],
         "type": "object",
         "properties": {
@@ -781,7 +1219,7 @@
             "type": "string",
             "format": "email"
           },
-          "password": {
+          "senha": {
             "minLength": 1,
             "type": "string"
           }
@@ -792,25 +1230,27 @@
         "required": [
           "cpf",
           "email",
-          "nomeCompleto",
+          "nome",
           "telefone"
         ],
         "type": "object",
         "properties": {
-          "nomeCompleto": {
+          "nome": {
+            "minLength": 3,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
+          },
+          "telefone": {
             "minLength": 1,
             "type": "string"
           },
           "cpf": {
             "minLength": 1,
-            "type": "string"
-          },
-          "email": {
-            "minLength": 1,
-            "type": "string"
-          },
-          "telefone": {
-            "minLength": 1,
+            "pattern": "^\\d{11}$|^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$",
             "type": "string"
           }
         },
@@ -818,36 +1258,79 @@
       },
       "ReservaDto": {
         "required": [
-          "livroId",
-          "membroId"
+          "cpfMembro",
+          "isbnLivro"
         ],
         "type": "object",
         "properties": {
-          "membroId": {
-            "type": "integer",
-            "format": "int32"
+          "cpfMembro": {
+            "minLength": 1,
+            "pattern": "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$",
+            "type": "string"
           },
-          "livroId": {
-            "type": "integer",
-            "format": "int32"
+          "isbnLivro": {
+            "maxLength": 13,
+            "minLength": 10,
+            "type": "string"
           }
         },
         "additionalProperties": false
       },
       "UsuarioDto": {
+        "required": [
+          "email",
+          "nome",
+          "perfil",
+          "senha"
+        ],
         "type": "object",
         "properties": {
           "nome": {
-            "type": "string",
-            "nullable": true
+            "minLength": 1,
+            "type": "string"
           },
           "email": {
+            "minLength": 1,
             "type": "string",
-            "nullable": true
+            "format": "email"
+          },
+          "senha": {
+            "minLength": 6,
+            "type": "string"
+          },
+          "perfil": {
+            "minLength": 1,
+            "pattern": "^(Administrador|Funcionario)$",
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UsuarioUpdateDto": {
+        "required": [
+          "email",
+          "nome",
+          "perfil"
+        ],
+        "type": "object",
+        "properties": {
+          "nome": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "email": {
+            "minLength": 1,
+            "type": "string",
+            "format": "email"
           },
           "senha": {
             "type": "string",
             "nullable": true
+          },
+          "perfil": {
+            "minLength": 1,
+            "pattern": "^(Administrador|Bibliotecario)$",
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -856,7 +1339,7 @@
     "securitySchemes": {
       "Bearer": {
         "type": "apiKey",
-        "description": "Bearer {token}",
+        "description": "Insira o token JWT desta forma: Bearer {seu_token}",
         "name": "Authorization",
         "in": "header"
       }

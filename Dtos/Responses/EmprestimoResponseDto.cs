@@ -1,19 +1,19 @@
+using System;
+
 namespace BiblioSystem.Dtos.Responses
 {
     public class EmprestimoResponseDto
     {
         public int Id { get; set; }
-
-        public DateOnly DataEmprestimo { get; set; }
-
-        public DateOnly DataPrevistaDevolucao { get; set; }
-
-        public DateOnly? DataDevolucao { get; set; }
-
-        public decimal Multa { get; set; }
-
-        public MembroResponseDto? Membro { get; set; }
-
-        public ExemplarResponseDto? Exemplar { get; set; }
+        public DateTime DataEmprestimo { get; set; }
+        public DateTime DataPrevistaDevolucao { get; set; }
+        public DateTime? DataDevolucao { get; set; }
+        public decimal ValorMulta { get; set; }
+        public required string Status { get; set; }
+        public int MembroId { get; set; }
+        public int ExemplarId { get; set; }
+        public string? CodigoExemplar { get; set; } 
+        public required string NomeMembro { get; set; }
+        public required string TituloLivro { get; set; }
     }
 }

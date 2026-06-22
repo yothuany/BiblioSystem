@@ -88,15 +88,15 @@
               "target": "Package",
               "version": "[8.19.0, )"
             },
-            "Microsoft.OpenApi": {
-              "target": "Package",
-              "version": "[1.6.14, )"
-            },
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
               "version": "[8.0.3, )"
             },
             "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[6.6.2, )"
+            },
+            "Swashbuckle.AspNetCore.Annotations": {
               "target": "Package",
               "version": "[6.6.2, )"
             },

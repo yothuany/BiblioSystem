@@ -4,10 +4,11 @@ namespace BiblioSystem.Dtos
 {
     public class ExemplarDto
     {
-        [Required]
-        public required string CodigoExemplar { get; set; }
+        [Required(ErrorMessage = "O código do exemplar é obrigatório.")]
+        public required string Codigo { get; set; }
 
-        [Required]
-        public int LivroId { get; set; }
+        [Required(ErrorMessage = "O campo IsbnLivro é obrigatório.")]
+        [StringLength(13, MinimumLength = 10, ErrorMessage = "O ISBN deve ter entre 10 e 13 caracteres.")]
+        public required string IsbnLivro { get; set; }
     }
 }

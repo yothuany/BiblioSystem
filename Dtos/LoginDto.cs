@@ -4,11 +4,11 @@ namespace BiblioSystem.Dtos
 {
     public class LoginDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "O e-mail é obrigatório.")]
+        [EmailAddress(ErrorMessage = "E-mail inválido.")]
         public required string Email { get; set; }
 
-        [Required]
-        public required string Password { get; set; }
+        [Required(ErrorMessage = "A senha é obrigatória.")]
+        public required string Senha { get; set; }
     }
 }

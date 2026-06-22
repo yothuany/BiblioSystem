@@ -1,136 +1,96 @@
 using AutoMapper;
+using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
 using BiblioSystem.Dtos;
+using BiblioSystem.Dtos.Responses;
 using BiblioSystem.Exceptions;
+using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BiblioSystem.Services
 {
     public class EmprestimoService
     {
         private readonly AppDbContext _context;
-
         private readonly IMapper _mapper;
 
-        public EmprestimoService(
-            AppDbContext context,
-            IMapper mapper
-        )
+        public EmprestimoService(AppDbContext context, IMapper mapper)
         {
             _context = context;
-
             _mapper = mapper;
         }
 
-
-        public async Task<
-            Emprestimo
-        > Create(
-            EmprestimoDto data
-        )
+        public async Task<PaginatedResponse<EmprestimoResponseDto>> FindAll(EmprestimoFilter filter)
         {
             try
             {
-                var membro =
-                    await _context
-                    .Membros
-                    .AnyAsync(
-                        x =>
-                        x.Id
-                        ==
-                        data.MembroId
-                    );
+                var query = _context.Emprestimo
+                    .Include(x => x.Membro)
+                    .Include(x => x.Exemplar)
+                        .ThenInclude(e => e.Livro)
+                    .AsQueryable();
 
-                if (!membro)
+                if (filter.Search is not null)
                 {
-                    throw new ErrorServiceException(
-                        "Membro não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                "Membro inválido"
-                            }
-                        )
-                    );
+                    if (int.TryParse(filter.Search, out int numeroBuscado))
+                    {
+                        query = query.Where(x => x.Id == numeroBuscado ||
+                                                 x.ExemplarId == numeroBuscado);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Status.Contains(filter.Search) ||
+                               x.Membro!.Nome.Contains(filter.Search) ||
+                               x.Membro!.Cpf.Contains(filter.Search) ||
+                               x.Exemplar!.Codigo.Contains(filter.Search));
+                    }
                 }
 
+              
 
-                var exemplar =
-                    await _context
-                    .Exemplares
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        data.ExemplarId
-                    );
+                return await Paginate<Emprestimo>.Set<EmprestimoResponseDto>(query, filter, _mapper);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
 
-
-                if (
-                    exemplar
-                    is null
-                )
+        public async Task<Emprestimo> Create(EmprestimoDto data)
+        {
+            try
+            {
+                var membro = await _context.Membro.FirstOrDefaultAsync(m => m.Cpf == data.CpfMembro);
+                if (membro is null)
                 {
-                    throw new ErrorServiceException(
-                        "Exemplar não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                "Exemplar inválido"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Membro com CPF {data.CpfMembro} não encontrado",
+                        c => c.BadRequest(new { message = $"Não é possível emprestar: Membro com CPF {data.CpfMembro} não existe." }));
                 }
 
-
-                if (
-                    exemplar.Status
-                    !=
-                    "disponivel"
-                )
+                var exemplar = await _context.Exemplar.FirstOrDefaultAsync(e => e.Codigo == data.CodigoExemplar);
+                if (exemplar is null)
                 {
-                    throw new ErrorServiceException(
-                        "Exemplar indisponível",
-
-                        c =>
-                        c.Conflict(
-                            new
-                            {
-                                message =
-                                "Livro indisponível"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Exemplar com Código {data.CodigoExemplar} não encontrado",
+                        c => c.BadRequest(new { message = $"Não é possível emprestar: Exemplar com Código {data.CodigoExemplar} não existe." }));
                 }
 
+                var emprestimo = new Emprestimo
+                {
+                    MembroId = membro.Id,
+                    ExemplarId = exemplar.Id,
+                    DataEmprestimo = DateTime.Now,
+                    DataPrevistaDevolucao = DateTime.Now.AddDays(data.DiasDeEmprestimo).Date,
+                    Status = "Ativo",
+                    ValorMulta = 0.00m
+                };
 
-                var emprestimo =
-                    _mapper
-                    .Map<
-                        Emprestimo
-                    >(
-                        data
-                    );
-
-                exemplar.Status =
-                    "emprestado";
-
-
-                await _context
-                    .Emprestimos
-                    .AddAsync(
-                        emprestimo
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                await _context.Emprestimo.AddAsync(emprestimo);
+                await _context.SaveChangesAsync();
 
                 return emprestimo;
             }
@@ -140,67 +100,21 @@ namespace BiblioSystem.Services
             }
         }
 
-
-        public async Task<
-            Emprestimo
-        > RegistrarDevolucao(
-            int id
-        )
+        public async Task<Emprestimo> FindById(int id)
         {
             try
             {
-                var emprestimo =
-                    await _context
-                    .Emprestimos
-                    .Include(
-                        x =>
-                        x.Exemplar
-                    )
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        id
-                    );
+                var emprestimo = await _context.Emprestimo
+                    .Include(x => x.Membro)
+                    .Include(x => x.Exemplar)
+                        .ThenInclude(e => e.Livro)
+                    .FirstOrDefaultAsync(x => x.Id == id);
 
-                if (
-                    emprestimo
-                    is null
-                )
+                if (emprestimo is null)
                 {
-                    throw new ErrorServiceException(
-                        "Empréstimo não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                "Registro inexistente"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Empréstimo {id} não encontrado",
+                        c => c.NotFound(new { message = $"Empréstimo #{id} não encontrado" }));
                 }
-
-
-                emprestimo.DataDevolucao =
-                    DateOnly
-                    .FromDateTime(
-                        DateTime.Now
-                    );
-
-                emprestimo.Exemplar!.Status =
-                    "disponivel";
-
-
-                emprestimo.Multa =
-                    CalcularMulta(
-                        emprestimo
-                    );
-
-
-                await _context
-                    .SaveChangesAsync();
 
                 return emprestimo;
             }
@@ -210,53 +124,50 @@ namespace BiblioSystem.Services
             }
         }
 
-
-        public decimal
-        CalcularMulta(
-            Emprestimo emprestimo
-        )
+        public async Task<Emprestimo> RegistrarDevolucao(int id)
         {
-            if (
-                emprestimo.DataDevolucao
-                is null
-            )
+            try
             {
-                return 0;
+                var emprestimo = await FindById(id);
+
+                if (emprestimo.Status == "Devolvido")
+                {
+                    throw new ErrorServiceException($"Empréstimo {id} já foi devolvido",
+                        c => c.BadRequest(new { message = "Este empréstimo já se encontra devolvido." }));
+                }
+
+                emprestimo.DataDevolucao = DateTime.Now;
+                emprestimo.Status = "Devolvido";
+
+                if (emprestimo.DataDevolucao.Value.Date > emprestimo.DataPrevistaDevolucao.Date)
+                {
+                    var diasAtraso = (emprestimo.DataDevolucao.Value.Date - emprestimo.DataPrevistaDevolucao.Date).Days;
+                    emprestimo.ValorMulta = diasAtraso * 2.00m;
+                }
+
+                _context.Emprestimo.Update(emprestimo);
+                await _context.SaveChangesAsync();
+
+                return emprestimo;
             }
-
-
-            var atraso =
-                (
-                    emprestimo
-                    .DataDevolucao
-                    .Value
-                    .ToDateTime(
-                        TimeOnly.MinValue
-                    )
-
-                    -
-
-                    emprestimo
-                    .DataPrevistaDevolucao
-                    .ToDateTime(
-                        TimeOnly.MinValue
-                    )
-
-                )
-                .Days;
-
-
-            if (
-                atraso
-                <=
-                0
-            )
+            catch (Exception)
             {
-                return 0;
+                throw;
             }
+        }
 
-
-            return atraso * 2;
+        public async Task Remove(int id)
+        {
+            try
+            {
+                var emprestimo = await FindById(id);
+                _context.Emprestimo.Remove(emprestimo);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }

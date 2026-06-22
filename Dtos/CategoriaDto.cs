@@ -11,13 +11,6 @@ namespace BiblioSystem.Dtos
         )]
         public required string Nome { get; set; }
 
-        [Required(
-            ErrorMessage = "O campo Descrição é obrigatório"
-        )]
-        [MinLength(
-            5,
-            ErrorMessage = "Obrigatório mínimo de 5 caracteres"
-        )]
-        public required string Descricao { get; set; }
+        public string? Descricao { get; set; }
     }
 }

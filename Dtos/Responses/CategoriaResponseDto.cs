@@ -6,6 +6,6 @@ namespace BiblioSystem.Dtos.Responses
 
         public required string Nome { get; set; }
 
-        public required string Descricao { get; set; }
+        public string? Descricao { get; set; }
     }
 }

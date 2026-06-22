@@ -1,6 +1,8 @@
-﻿namespace BiblioSystem.Controllers.Filters
+﻿using BiblioSystem.Helpers.Paginated;
+
+namespace BiblioSystem.Controllers.Filters
 {
-    public class EmprestimoFilter
+    public class EmprestimoFilter : PaginatedFilter
     {
     }
 }

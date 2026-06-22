@@ -1,26 +1,27 @@
-using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BiblioSystem.Models
 {
-    [Table("membros"), PrimaryKey(nameof(Id))]
+    [Table("Membro"), PrimaryKey(nameof(Id))]
     public class Membro
     {
+        [Column("id_membro")]
         public int Id { get; set; }
 
-        public required string NomeCompleto { get; set; }
+        [Column("nome")]
+        public required string Nome { get; set; }
 
-        public required string CPF { get; set; }
-
+        [Column("email")]
         public required string Email { get; set; }
 
-        public required string Telefone { get; set; }
+        [Column("telefone")]
+        public required string Telefone { get; set; } 
 
-        public DateOnly DataCadastro { get; set; }
+        [Column("cpf")]
+        public required string Cpf { get; set; }
 
-        public ICollection<Emprestimo>? Emprestimos { get; set; }
-
-        public ICollection<Reserva>? Reservas { get; set; }
+        // (1:N)
+        public virtual ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
     }
 }

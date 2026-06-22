@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
 using BiblioSystem.Dtos;
@@ -14,400 +13,109 @@ namespace BiblioSystem.Services
     public class LivroService
     {
         private readonly AppDbContext _context;
-
         private readonly IMapper _mapper;
 
-        public LivroService(
-            AppDbContext context,
-            IMapper mapper
-        )
+        public LivroService(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-
-        public async Task<
-            ICollection<LivroResponseDto>
-        > FindAll()
+        public async Task<PaginatedResponse<LivroResponseDto>> FindAll(LivroFilter filter)
         {
             try
             {
-                return await _context
-                    .Livros
-                    .ProjectTo<LivroResponseDto>(
-                        _mapper.ConfigurationProvider
-                    )
-                    .ToListAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<
-            PaginatedResponse<
-                LivroResponseDto
-            >
-        > FindAllV2(
-            LivroFilter filter
-        )
-        {
-            try
-            {
-                var query =
-                    _context
-                    .Livros
-                    .Include(
-                        x => x.Categoria
-                    )
-                    .Include(
-                        x => x.Autores
-                    )
+                var query = _context.Livro
+                    .Include(x => x.Autores)
+                    .Include(x => x.Categorias) 
                     .AsQueryable();
 
-
-                if (
-                    filter.Search
-                    is not null
-                )
+                if (filter.Search is not null)
                 {
-                    query =
-                        query.Where(
-                            x =>
-                            x.Titulo
-                            .Contains(
-                                filter.Search
-                            )
-                        );
-                }
+                    var searchLimpo = filter.Search.Replace("-", "").Replace(" ", "");
+                    bool isbnCompleto = searchLimpo.Length == 10 || searchLimpo.Length == 13;
 
-
-                if (
-                    filter.CategoriaId
-                    is not null
-                )
-                {
-                    query =
-                        query.Where(
-                            x =>
-                            x.CategoriaId
-                            ==
-                            filter.CategoriaId
-                        );
-                }
-
-
-                if (
-                    filter.Editora
-                    is not null
-                )
-                {
-                    query =
-                        query.Where(
-                            x =>
-                            x.Editora
-                            .Contains(
-                                filter.Editora
-                            )
-                        );
-                }
-
-
-                if (
-                    filter.Autor
-                    is not null
-                )
-                {
-                    query =
-                        query.Where(
-                            x =>
-                            x.Autores!
-                            .Any(
-                                a =>
-                                a.Nome
-                                .Contains(
-                                    filter.Autor
-                                )
-                            )
-                        );
-                }
-
-
-                return await
-                    Paginate<Livro>
-                    .Set<
-                        LivroResponseDto
-                    >(
-                        query,
-                        filter,
-                        _mapper
-                    );
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<
-            Livro
-        > Create(
-            LivroDto data
-        )
-        {
-            try
-            {
-                var categoriaExiste =
-                    await _context
-                    .Categorias
-                    .AnyAsync(
-                        x =>
-                        x.Id
-                        ==
-                        data.CategoriaId
-                    );
-
-                if (
-                    !categoriaExiste
-                )
-                {
-                    throw new ErrorServiceException(
-                        "Categoria não encontrada",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Categoria #{data.CategoriaId} não encontrada"
-                            }
-                        )
-                    );
-                }
-
-
-                var livro =
-                    _mapper
-                    .Map<Livro>(
-                        data
-                    );
-
-                await _context
-                    .Livros
-                    .AddAsync(
-                        livro
-                    );
-
-                await _context
-                    .SaveChangesAsync();
-
-                return livro;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<
-            Livro
-        > FindById(
-            int id
-        )
-        {
-            try
-            {
-                var livro =
-                    await _context
-                    .Livros
-                    .Include(
-                        x => x.Categoria
-                    )
-                    .Include(
-                        x => x.Autores
-                    )
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        id
-                    );
-
-                if (
-                    livro
-                    is null
-                )
-                {
-                    throw new ErrorServiceException(
-                        $"Livro {id} não encontrado",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Livro #{id} não encontrado"
-                            }
-                        )
-                    );
-                }
-
-                return livro;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<
-            Livro
-        > Update(
-            int id,
-            LivroDto data
-        )
-        {
-            try
-            {
-                var livro =
-                    await FindById(
-                        id
-                    );
-
-                var categoriaExiste =
-                    await _context
-                    .Categorias
-                    .AnyAsync(
-                        x =>
-                        x.Id
-                        ==
-                        data.CategoriaId
-                    );
-
-                if (
-                    !categoriaExiste
-                )
-                {
-                    throw new ErrorServiceException(
-                        "Categoria não encontrada",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Categoria #{data.CategoriaId} não encontrada"
-                            }
-                        )
-                    );
-                }
-
-
-                _mapper.Map(
-                    data,
-                    livro
-                );
-
-                _context
-                    .Livros
-                    .Update(
-                        livro
-                    );
-
-                await _context
-                    .SaveChangesAsync();
-
-                return livro;
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-
-        public async Task<
-            Livro
-        > AddAutores(
-            int id,
-            LivroAutoresDto autores
-        )
-        {
-            try
-            {
-                var livro =
-                    await FindById(
-                        id
-                    );
-
-                var lista =
-                    await _context
-                    .Autores
-                    .Where(
-                        x =>
-                        autores
-                        .Ids
-                        .Contains(
-                            x.Id
-                        )
-                    )
-                    .ToListAsync();
-
-
-                if (
-                    lista.Count
-                    ==
-                    0
-                )
-                {
-                    throw new ErrorServiceException(
-                        "Autores não encontrados",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                "Nenhum autor encontrado"
-                            }
-                        )
-                    );
-                }
-
-
-                foreach (
-                    Autor autor
-                    in lista
-                )
-                {
-                    if (
-                        !livro
-                        .Autores!
-                        .Any(
-                            x =>
-                            x.Id
-                            ==
-                            autor.Id
-                        )
-                    )
+                    if (int.TryParse(filter.Search, out int idBuscado))
                     {
-                        livro
-                        .Autores!
-                        .Add(
-                            autor
-                        );
+                        query = query.Where(x => x.Id == idBuscado
+                                              || x.Titulo.Contains(filter.Search)
+                                              || (isbnCompleto && x.Isbn == filter.Search)
+                                              || x.Autores.Any(a => a.Nome.Contains(filter.Search)));
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Titulo.Contains(filter.Search)
+                                              || x.Autores.Any(a => a.Nome.Contains(filter.Search))
+                                              || (isbnCompleto && x.Isbn == filter.Search));
                     }
                 }
 
+                if (!string.IsNullOrEmpty(filter.Autor))
+                {
+                    query = query.Where(x => x.Autores.Any(a => a.Nome.Contains(filter.Autor)));
+                }
 
-                await _context
-                    .SaveChangesAsync();
+                return await Paginate<Livro>.Set<LivroResponseDto>(query, filter, _mapper);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<LivroResponseDto> Create(LivroDto data)
+        {
+            try
+            {
+                var autores = await _context.Autor
+                    .Where(a => data.AutoresIds.Contains(a.Id))
+                    .ToListAsync();
+
+                if (autores.Count != data.AutoresIds.Count)
+                {
+                    throw new ErrorServiceException("Um ou mais Autores informados não foram encontrados",
+                        c => c.BadRequest(new { message = "Um ou mais Autores informados não foram encontrados." }));
+                }
+
+                var categorias = await _context.Categoria
+                    .Where(c => data.CategoriasIds.Contains(c.Id))
+                    .ToListAsync();
+
+                if (categorias.Count != data.CategoriasIds.Count)
+                {
+                    throw new ErrorServiceException("Uma ou mais Categorias informadas não foram encontradas",
+                        c => c.BadRequest(new { message = "Uma ou mais Categorias informadas não foram encontradas." }));
+                }
+
+                var livro = _mapper.Map<Livro>(data);
+                livro.Autores = autores;
+                livro.Categorias = categorias;
+
+                await _context.Livro.AddAsync(livro);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<LivroResponseDto>(livro);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task<Livro> FindById(int id)
+        {
+            try
+            {
+                var livro = await _context.Livro
+                    .Include(x => x.Autores)
+                    .Include(x => x.Categorias)
+                    .FirstOrDefaultAsync(x => x.Id == id);
+
+                if (livro is null)
+                {
+                    throw new ErrorServiceException($"Livro {id} não encontrado",
+                        c => c.NotFound(new { message = $"Livro #{id} não encontrado" }));
+                }
 
                 return livro;
             }
@@ -417,27 +125,59 @@ namespace BiblioSystem.Services
             }
         }
 
-
-        public async Task
-        Remove(
-            int id
-        )
+        public async Task<LivroResponseDto> Update(int id, LivroDto data)
         {
             try
             {
-                var livro =
-                    await FindById(
-                        id
-                    );
+                var livro = await FindById(id);
 
-                _context
-                    .Livros
-                    .Remove(
-                        livro
-                    );
+                var autores = await _context.Autor
+                    .Where(a => data.AutoresIds.Contains(a.Id))
+                    .ToListAsync();
 
-                await _context
-                    .SaveChangesAsync();
+                if (autores.Count != data.AutoresIds.Count)
+                {
+                    throw new ErrorServiceException("Um ou mais Autores informados não foram encontrados",
+                        c => c.BadRequest(new { message = "Um ou mais Autores informados não foram encontrados." }));
+                }
+
+                var categorias = await _context.Categoria
+                    .Where(c => data.CategoriasIds.Contains(c.Id))
+                    .ToListAsync();
+
+                if (categorias.Count != data.CategoriasIds.Count)
+                {
+                    throw new ErrorServiceException("Uma ou mais Categorias informadas não foram encontradas",
+                        c => c.BadRequest(new { message = "Uma ou mais Categorias informadas não foram encontradas." }));
+                }
+
+                _mapper.Map(data, livro);
+
+                livro.Autores!.Clear();
+                foreach (var autor in autores) livro.Autores.Add(autor);
+
+                livro.Categorias!.Clear();
+                foreach (var categoria in categorias) livro.Categorias.Add(categoria);
+
+                _context.Livro.Update(livro);
+                await _context.SaveChangesAsync();
+
+                return _mapper.Map<LivroResponseDto>(livro);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
+        public async Task Remove(int id)
+        {
+            try
+            {
+                var livro = await FindById(id);
+
+                _context.Livro.Remove(livro);
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {

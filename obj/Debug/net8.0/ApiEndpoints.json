@@ -2,13 +2,13 @@
   {
     "ContainingType": "BiblioSystem.Controllers.AuthController",
     "Method": "Login",
-    "RelativePath": "auth/login",
+    "RelativePath": "auth/Login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "user",
         "Type": "BiblioSystem.Dtos.LoginDto",
         "IsRequired": true
       }
@@ -17,24 +17,14 @@
   },
   {
     "ContainingType": "BiblioSystem.Controllers.AutorController",
-    "Method": "FindAll",
-    "RelativePath": "autores",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.AutorController",
     "Method": "Create",
-    "RelativePath": "autores",
+    "RelativePath": "autor/Cadastrar",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "novoAutor",
         "Type": "BiblioSystem.Dtos.AutorDto",
         "IsRequired": true
       }
@@ -43,8 +33,34 @@
   },
   {
     "ContainingType": "BiblioSystem.Controllers.AutorController",
+    "Method": "FindAll",
+    "RelativePath": "autor/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.AutorController",
     "Method": "Update",
-    "RelativePath": "autores/{id}",
+    "RelativePath": "autor/Editar/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -55,7 +71,7 @@
         "IsRequired": true
       },
       {
-        "Name": "data",
+        "Name": "autorDto",
         "Type": "BiblioSystem.Dtos.AutorDto",
         "IsRequired": true
       }
@@ -65,7 +81,7 @@
   {
     "ContainingType": "BiblioSystem.Controllers.AutorController",
     "Method": "Remove",
-    "RelativePath": "autores/{id}",
+    "RelativePath": "autor/Remover/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -79,9 +95,25 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "BiblioSystem.Controllers.AutorController",
-    "Method": "FindAllV2",
-    "RelativePath": "autores/v2",
+    "ContainingType": "BiblioSystem.Controllers.CategoriaController",
+    "Method": "Create",
+    "RelativePath": "categoria/Cadastrar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "novaCategoria",
+        "Type": "BiblioSystem.Dtos.CategoriaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.CategoriaController",
+    "Method": "FindAll",
+    "RelativePath": "categoria/Consultar",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -106,50 +138,8 @@
   },
   {
     "ContainingType": "BiblioSystem.Controllers.CategoriaController",
-    "Method": "FindAll",
-    "RelativePath": "categorias",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.CategoriaController",
-    "Method": "Create",
-    "RelativePath": "categorias",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "novaCategoria",
-        "Type": "BiblioSystem.Dtos.CategoriaDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.CategoriaController",
-    "Method": "FindById",
-    "RelativePath": "categorias/{id}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.CategoriaController",
     "Method": "Update",
-    "RelativePath": "categorias/{id}",
+    "RelativePath": "categoria/Editar/{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -170,7 +160,7 @@
   {
     "ContainingType": "BiblioSystem.Controllers.CategoriaController",
     "Method": "Remove",
-    "RelativePath": "categorias/{id}",
+    "RelativePath": "categoria/Remover/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -186,13 +176,13 @@
   {
     "ContainingType": "BiblioSystem.Controllers.EmprestimoController",
     "Method": "Create",
-    "RelativePath": "emprestimos",
+    "RelativePath": "emprestimo/Cadastrar",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "novoEmprestimo",
         "Type": "BiblioSystem.Dtos.EmprestimoDto",
         "IsRequired": true
       }
@@ -201,9 +191,51 @@
   },
   {
     "ContainingType": "BiblioSystem.Controllers.EmprestimoController",
-    "Method": "RegistrarDevolucao",
-    "RelativePath": "emprestimos/{id}/devolucao",
-    "HttpMethod": "PATCH",
+    "Method": "FindAll",
+    "RelativePath": "emprestimo/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.EmprestimoController",
+    "Method": "Devolver",
+    "RelativePath": "emprestimo/Devolver/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.EmprestimoController",
+    "Method": "Remove",
+    "RelativePath": "emprestimo/Remove/{id}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -217,20 +249,110 @@
   },
   {
     "ContainingType": "BiblioSystem.Controllers.ExemplarController",
+    "Method": "Create",
+    "RelativePath": "exemplar/Cadastrar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "novoExemplar",
+        "Type": "BiblioSystem.Dtos.ExemplarDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.ExemplarController",
     "Method": "FindAll",
-    "RelativePath": "exemplares",
+    "RelativePath": "exemplar/Consultar",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "Status",
+        "Name": "Search",
         "Type": "System.String",
         "IsRequired": false
       },
       {
-        "Name": "LivroId",
-        "Type": "System.Nullable\u00601[[System.Int32, System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.ExemplarController",
+    "Method": "Update",
+    "RelativePath": "exemplar/Editar/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "exemplarDto",
+        "Type": "BiblioSystem.Dtos.ExemplarDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.ExemplarController",
+    "Method": "Remove",
+    "RelativePath": "exemplar/Remover/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.LivroController",
+    "Method": "Create",
+    "RelativePath": "livro/Cadastrar",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "novoLivro",
+        "Type": "BiblioSystem.Dtos.LivroDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.LivroController",
+    "Method": "FindAll",
+    "RelativePath": "livro/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Autor",
+        "Type": "System.String",
         "IsRequired": false
       },
       {
@@ -252,26 +374,10 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "BiblioSystem.Controllers.ExemplarController",
-    "Method": "Create",
-    "RelativePath": "exemplares",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "data",
-        "Type": "BiblioSystem.Dtos.ExemplarDto",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.ExemplarController",
-    "Method": "UpdateStatus",
-    "RelativePath": "exemplares/{id}/status",
-    "HttpMethod": "PATCH",
+    "ContainingType": "BiblioSystem.Controllers.LivroController",
+    "Method": "Update",
+    "RelativePath": "livro/Editar/{id}",
+    "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -281,34 +387,24 @@
         "IsRequired": true
       },
       {
-        "Name": "status",
-        "Type": "System.String",
-        "IsRequired": false
+        "Name": "livroDto",
+        "Type": "BiblioSystem.Dtos.LivroDto",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []
   },
   {
     "ContainingType": "BiblioSystem.Controllers.LivroController",
-    "Method": "FindAll",
-    "RelativePath": "livros",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "BiblioSystem.Controllers.LivroController",
-    "Method": "Create",
-    "RelativePath": "livros",
-    "HttpMethod": "POST",
+    "Method": "Remove",
+    "RelativePath": "livro/Remover/{id}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
-        "Type": "BiblioSystem.Dtos.LivroDto",
+        "Name": "id",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],
@@ -317,13 +413,60 @@
   {
     "ContainingType": "BiblioSystem.Controllers.MembroController",
     "Method": "Create",
-    "RelativePath": "membros",
+    "RelativePath": "membro/Cadastrar",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "novoMembro",
+        "Type": "BiblioSystem.Dtos.MembroDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.MembroController",
+    "Method": "FindAll",
+    "RelativePath": "membro/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.MembroController",
+    "Method": "Update",
+    "RelativePath": "membro/Editar/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "membroDto",
         "Type": "BiblioSystem.Dtos.MembroDto",
         "IsRequired": true
       }
@@ -333,7 +476,7 @@
   {
     "ContainingType": "BiblioSystem.Controllers.MembroController",
     "Method": "Remove",
-    "RelativePath": "membros/{id}",
+    "RelativePath": "membro/Remover/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -349,13 +492,13 @@
   {
     "ContainingType": "BiblioSystem.Controllers.ReservaController",
     "Method": "Create",
-    "RelativePath": "reservas",
+    "RelativePath": "reserva/Cadastrar",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "novaReserva",
         "Type": "BiblioSystem.Dtos.ReservaDto",
         "IsRequired": true
       }
@@ -365,8 +508,50 @@
   {
     "ContainingType": "BiblioSystem.Controllers.ReservaController",
     "Method": "Cancelar",
-    "RelativePath": "reservas/{id}/cancelar",
-    "HttpMethod": "PATCH",
+    "RelativePath": "reserva/Cancelar/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.ReservaController",
+    "Method": "FindAll",
+    "RelativePath": "reserva/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "Search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "Page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "Limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.ReservaController",
+    "Method": "Remove",
+    "RelativePath": "reserva/Remove/{id}",
+    "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
     "Parameters": [
@@ -381,15 +566,62 @@
   {
     "ContainingType": "BiblioSystem.Controllers.UsuarioController",
     "Method": "Create",
-    "RelativePath": "usuarios",
+    "RelativePath": "usuarios/Cadastrar",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
-        "Name": "data",
+        "Name": "dto",
         "Type": "BiblioSystem.Dtos.UsuarioDto",
         "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.UsuarioController",
+    "Method": "GetAll",
+    "RelativePath": "usuarios/Consultar",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.UsuarioController",
+    "Method": "Update",
+    "RelativePath": "usuarios/Editar",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "dto",
+        "Type": "BiblioSystem.Dtos.UsuarioUpdateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BiblioSystem.Controllers.UsuarioController",
+    "Method": "Delete",
+    "RelativePath": "usuarios/Remover",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": false
       }
     ],
     "ReturnTypes": []

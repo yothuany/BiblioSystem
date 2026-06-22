@@ -2,7 +2,7 @@
 
 namespace BiblioSystem.Controllers.Filters
 {
-    public class MembroFilter : PaginatedFilter
+    public class UsuarioFilter : PaginatedFilter
     {
     }
 }

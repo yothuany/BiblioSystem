@@ -1,5 +1,4 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using BiblioSystem.Controllers.Filters;
 using BiblioSystem.DataContexts;
 using BiblioSystem.Dtos;
@@ -14,34 +13,32 @@ namespace BiblioSystem.Services
     public class CategoriaService
     {
         private readonly AppDbContext _context;
-
         private readonly IMapper _mapper;
 
-        public CategoriaService(
-            AppDbContext context,
-            IMapper mapper
-        )
+        public CategoriaService(AppDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<
-            ICollection<
-                CategoriaResponseDto
-            >
-        > FindAll()
+        public async Task<PaginatedResponse<CategoriaResponseDto>> FindAll(CategoriaFilter filter)
         {
             try
             {
-                return await _context
-                    .Categorias
-                    .ProjectTo<
-                        CategoriaResponseDto
-                    >(
-                        _mapper.ConfigurationProvider
-                    )
-                    .ToListAsync();
+                var query = _context.Categoria.AsQueryable();
+
+                if (filter.Search is not null)
+                {
+                    if (int.TryParse(filter.Search, out int idBuscado))
+                    {
+                        query = query.Where(x => x.Id == idBuscado);
+                    }
+                    else
+                    {
+                        query = query.Where(x => x.Nome.Contains(filter.Search));
+                    }
+                }
+                return await Paginate<Categoria>.Set<CategoriaResponseDto>(query, filter, _mapper);
             }
             catch (Exception)
             {
@@ -49,28 +46,14 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Categoria
-        > Create(
-            CategoriaDto data
-        )
+        public async Task<Categoria> Create(CategoriaDto data)
         {
             try
             {
-                var categoria =
-                    _mapper
-                    .Map<Categoria>(
-                        data
-                    );
+                var categoria = _mapper.Map<Categoria>(data);
 
-                await _context
-                    .Categorias
-                    .AddAsync(
-                        categoria
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                await _context.Categoria.AddAsync(categoria);
+                await _context.SaveChangesAsync();
 
                 return categoria;
             }
@@ -80,41 +63,16 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Categoria
-        > FindById(
-            int id
-        )
+        public async Task<Categoria> FindById(int id)
         {
             try
             {
-                var categoria =
-                    await _context
-                    .Categorias
-                    .FirstOrDefaultAsync(
-                        x =>
-                        x.Id
-                        ==
-                        id
-                    );
+                var categoria = await _context.Categoria.FirstOrDefaultAsync(x => x.Id == id);
 
-                if (
-                    categoria
-                    is null
-                )
+                if (categoria is null)
                 {
-                    throw new ErrorServiceException(
-                        "Categoria não encontrada",
-
-                        c =>
-                        c.NotFound(
-                            new
-                            {
-                                message =
-                                $"Categoria #{id} não encontrada"
-                            }
-                        )
-                    );
+                    throw new ErrorServiceException($"Categoria {id} não encontrada",
+                        c => c.NotFound(new { message = $"Categoria #{id} não encontrada" }));
                 }
 
                 return categoria;
@@ -125,33 +83,16 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task<
-            Categoria
-        > Update(
-            int id,
-            CategoriaDto data
-        )
+        public async Task<Categoria> Update(int id, CategoriaDto data)
         {
             try
             {
-                var categoria =
-                    await FindById(
-                        id
-                    );
+                var categoria = await FindById(id);
 
-                _mapper.Map(
-                    data,
-                    categoria
-                );
+                _mapper.Map(data, categoria);
 
-                _context
-                    .Categorias
-                    .Update(
-                        categoria
-                    );
-
-                await _context
-                    .SaveChangesAsync();
+                _context.Categoria.Update(categoria);
+                await _context.SaveChangesAsync();
 
                 return categoria;
             }
@@ -161,25 +102,23 @@ namespace BiblioSystem.Services
             }
         }
 
-        public async Task Remove(
-            int id
-        )
+        public async Task Remove(int id)
         {
             try
             {
-                var categoria =
-                    await FindById(
-                        id
-                    );
+                var categoria = await FindById(id);
 
-                _context
-                    .Categorias
-                    .Remove(
-                        categoria
-                    );
+                var possuiLivros = await _context.Livro
+                    .AnyAsync(l => l.Categorias.Any(c => c.Id == id));
 
-                await _context
-                    .SaveChangesAsync();
+                if (possuiLivros)
+                {
+                    throw new ErrorServiceException($"Não é possível remover a categoria porque ela possui livros vinculados.",
+                        c => c.BadRequest(new { message = $"A categoria '{categoria.Nome}' não pode ser removida porque está vinculada a um ou mais livros." }));
+                }
+
+                _context.Categoria.Remove(categoria);
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {
