@@ -10,7 +10,7 @@ namespace BiblioSystem.Controllers
 {
     [ApiController]
     [Route("autor")]
-   // [Authorize]
+    [Authorize]
     public class AutorController : ControllerBase
     {
         private readonly AutorService _service;

@@ -10,7 +10,7 @@ namespace BiblioSystem.Controllers
 {
     [ApiController]
     [Route("reserva")]
-    //[Authorize]
+    [Authorize]
     public class ReservaController : ControllerBase
     {
         private readonly ReservaService _service;

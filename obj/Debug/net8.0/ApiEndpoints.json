@@ -592,7 +592,7 @@
   {
     "ContainingType": "BiblioSystem.Controllers.UsuarioController",
     "Method": "Update",
-    "RelativePath": "usuarios/Editar",
+    "RelativePath": "usuarios/Editar{id}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -600,7 +600,7 @@
       {
         "Name": "id",
         "Type": "System.Int32",
-        "IsRequired": false
+        "IsRequired": true
       },
       {
         "Name": "dto",
@@ -613,7 +613,7 @@
   {
     "ContainingType": "BiblioSystem.Controllers.UsuarioController",
     "Method": "Delete",
-    "RelativePath": "usuarios/Remover",
+    "RelativePath": "usuarios/Remover{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -621,7 +621,7 @@
       {
         "Name": "id",
         "Type": "System.Int32",
-        "IsRequired": false
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []

@@ -13,7 +13,7 @@ namespace BiblioSystem.Controllers
 {
     [ApiController]
     [Route("emprestimo")]
-    //  [Authorize]
+    [Authorize]
     public class EmprestimoController : ControllerBase
     {
         private readonly EmprestimoService _service;

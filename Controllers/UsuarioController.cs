@@ -13,7 +13,7 @@ namespace BiblioSystem.Controllers
 {
     [Route("usuarios")]
     [ApiController]
-    [Authorize(Roles = "Administrador")]
+   // [Authorize(Roles = "Administrador")]
     public class UsuarioController : ControllerBase
     {
         private readonly AppDbContext _context;
