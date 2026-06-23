@@ -1,7 +1,10 @@
 # 📚 BiblioSystem
 
-API REST para gerenciamento de uma biblioteca, desenvolvida em **C# / ASP.NET Core 8**.
+**Documentação de Software (PDF) e Banco de Dados (SQL)  — BiblioSystem**
 
+🔗 Acesse a pasta com os arquivos: https://drive.google.com/drive/folders/1KeXwlFNlDPXgaSrwW2U0FhOQrlWvQP3N?usp=sharing
+
+---
 ## 📑 Sumário
 
 - [🧪 Usuários de teste](#-usuários-de-teste)
@@ -15,6 +18,8 @@ API REST para gerenciamento de uma biblioteca, desenvolvida em **C# / ASP.NET Co
 - [🌐 Endpoints da API](#-endpoints-da-api)
 - [📐 Regras de negócio](#-regras-de-negócio)
 ---
+
+API REST para gerenciamento de uma biblioteca, desenvolvida em **C# / ASP.NET Core 8**.
 
 ## 🧪 Usuários de teste
 (login rápido)
