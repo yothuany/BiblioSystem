@@ -8,7 +8,6 @@ using BiblioSystem.Helpers.Paginated;
 using BiblioSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -32,7 +31,7 @@ namespace BiblioSystem.Services
                 var query = _context.Emprestimo
                     .Include(x => x.Membro)
                     .Include(x => x.Exemplar)
-                        .ThenInclude(e => e.Livro)
+                        .ThenInclude(e => e!.Livro)
                     .AsQueryable();
 
                 if (filter.Search is not null)
@@ -45,13 +44,11 @@ namespace BiblioSystem.Services
                     else
                     {
                         query = query.Where(x => x.Status.Contains(filter.Search) ||
-                               x.Membro!.Nome.Contains(filter.Search) ||
-                               x.Membro!.Cpf.Contains(filter.Search) ||
-                               x.Exemplar!.Codigo.Contains(filter.Search));
+                                                 x.Membro!.Nome.Contains(filter.Search) ||
+                                                 x.Membro!.Cpf.Contains(filter.Search) ||
+                                                 x.Exemplar!.Codigo.Contains(filter.Search));
                     }
                 }
-
-              
 
                 return await Paginate<Emprestimo>.Set<EmprestimoResponseDto>(query, filter, _mapper);
             }
@@ -79,6 +76,15 @@ namespace BiblioSystem.Services
                         c => c.BadRequest(new { message = $"Não é possível emprestar: Exemplar com Código {data.CodigoExemplar} não existe." }));
                 }
 
+                if (exemplar.Status != "Disponível")
+                {
+                    throw new ErrorServiceException($"Exemplar indisponível",
+                        c => c.BadRequest(new { message = $"Não é possível realizar o empréstimo: O exemplar '{data.CodigoExemplar}' encontra-se com o status '{exemplar.Status}'." }));
+                }
+
+                exemplar.Status = "Emprestado";
+                _context.Exemplar.Update(exemplar);
+
                 var emprestimo = new Emprestimo
                 {
                     MembroId = membro.Id,
@@ -90,6 +96,7 @@ namespace BiblioSystem.Services
                 };
 
                 await _context.Emprestimo.AddAsync(emprestimo);
+
                 await _context.SaveChangesAsync();
 
                 return emprestimo;
@@ -107,7 +114,7 @@ namespace BiblioSystem.Services
                 var emprestimo = await _context.Emprestimo
                     .Include(x => x.Membro)
                     .Include(x => x.Exemplar)
-                        .ThenInclude(e => e.Livro)
+                        .ThenInclude(e => e!.Livro)
                     .FirstOrDefaultAsync(x => x.Id == id);
 
                 if (emprestimo is null)
@@ -128,7 +135,15 @@ namespace BiblioSystem.Services
         {
             try
             {
-                var emprestimo = await FindById(id);
+                var emprestimo = await _context.Emprestimo
+                    .Include(e => e.Exemplar)
+                    .FirstOrDefaultAsync(e => e.Id == id);
+
+                if (emprestimo is null)
+                {
+                    throw new ErrorServiceException($"Empréstimo {id} não encontrado",
+                        c => c.NotFound(new { message = $"Empréstimo #{id} não encontrado" }));
+                }
 
                 if (emprestimo.Status == "Devolvido")
                 {
@@ -143,6 +158,12 @@ namespace BiblioSystem.Services
                 {
                     var diasAtraso = (emprestimo.DataDevolucao.Value.Date - emprestimo.DataPrevistaDevolucao.Date).Days;
                     emprestimo.ValorMulta = diasAtraso * 2.00m;
+                }
+
+                if (emprestimo.Exemplar is not null)
+                {
+                    emprestimo.Exemplar.Status = "Disponível";
+                    _context.Exemplar.Update(emprestimo.Exemplar);
                 }
 
                 _context.Emprestimo.Update(emprestimo);

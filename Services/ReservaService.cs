@@ -69,10 +69,19 @@ namespace BiblioSystem.Services
                         c => c.BadRequest(new { message = $"Não é possível reservar: Membro com CPF {data.CpfMembro} não existe." }));
                 }
 
+                var possuiExemplarDisponivel = await _context.Exemplar
+                    .AnyAsync(e => e.LivroId == livro.Id && e.Status == "Disponível");
+
+                if (possuiExemplarDisponivel)
+                {
+                    throw new ErrorServiceException($"Livro {livro.Titulo} possui exemplares disponíveis",
+                        c => c.BadRequest(new { message = $"Não é possível reservar: A obra '{livro.Titulo}' possui exemplares disponíveis na estante para empréstimo imediato." }));
+                }
+
                 var reserva = new Reserva
                 {
-                    LivroId = livro.Id,       
-                    MembroId = membro.Id,     
+                    LivroId = livro.Id,
+                    MembroId = membro.Id,
                     DataReserva = DateTime.Now.Date,
                     Status = "Ativa"
                 };
