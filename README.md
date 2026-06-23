@@ -3,11 +3,12 @@
 API REST para gerenciamento de uma biblioteca, desenvolvida em **C# / ASP.NET Core 8**.
 
 ## 📑 Sumário
+
 - [🧪 Usuários de teste](#-usuários-de-teste)
 - [🔐 Autenticação e autorização](#-autenticação-e-autorização)
-- [Perfis de acesso (`Perfil`)](#perfis-de-acesso-perfil)
-- [Como a senha é protegida no banco](#como-a-senha-é-protegida-no-banco)
 - [📖 Sobre o projeto](#-sobre-o-projeto)
+- [👥 Perfis de acesso (`Perfil`)](#-perfis-de-acesso-perfil)
+- [🛡️ Como a senha é protegida no banco](#️-como-a-senha-é-protegida-no-banco)
 - [🛠 Tecnologias utilizadas](#-tecnologias-utilizadas)
 - [🗂 Modelo de domínio](#-modelo-de-domínio)
 - [📁 Estrutura de pastas](#-estrutura-de-pastas)
@@ -56,7 +57,21 @@ Antes de usar qualquer endpoint do sistema, é necessário **fazer login** e usa
    O token tem validade de **3 horas**. Após esse período, é necessário logar novamente.
 ---
 
-### Perfis de acesso (`Perfil`)
+## 📖 Sobre o projeto
+
+O **BiblioSystem** é o back-end (API) de um sistema de gerenciamento de biblioteca. Ele permite que uma instituição controle:
+
+- O **acervo**: livros, autores e categorias (relações N:N entre eles).
+- Os **exemplares físicos** de cada livro (com status "Disponível" / "Emprestado").
+- Os **membros** da biblioteca (leitores que pegam livros emprestados).
+- Os **empréstimos**, com data prevista de devolução e cálculo automático de multa em caso de atraso.
+- As **reservas** de livros que estejam indisponíveis no momento.
+- Os **usuários do sistema** (funcionários e administradores) que acessam a API, com login via e-mail/senha e emissão de token JWT.
+
+O projeto segue uma arquitetura em camadas (**Controller → Service → DbContext**), com DTOs de entrada e saída, tratamento de erros centralizado e paginação genérica e reutilizável para todas as listagens.
+
+---
+### 👥 Perfis de acesso (`Perfil`)
 
 Cada usuário cadastrado na tabela `Usuario` possui um campo **`Perfil`**, que é incluído no token como uma claim de *Role*. Na prática, o sistema reconhece dois níveis de acesso:
 
@@ -69,7 +84,7 @@ Cada usuário cadastrado na tabela `Usuario` possui um campo **`Perfil`**, que �
 
 
 
-### Como a senha é protegida no banco
+### 🛡️ Como a senha é protegida no banco
 
 O projeto **nunca grava a senha em texto puro**. O hashing é feito pela classe `Microsoft.AspNetCore.Identity.PasswordHasher<Usuario>` (a mesma usada pelo ASP.NET Core Identity), tanto no cadastro (`UsuarioController.Create`) quanto na verificação do login (`AuthController.Login`):
 
@@ -98,22 +113,6 @@ Isso traz duas consequências importantes:
 - **Duas senhas iguais geram hashes diferentes**, porque o salt é aleatório a cada vez — é por isso que os dois hashes de exemplo acima (de `abacaxi` e `banana`) não seguem nenhum padrão visualmente parecido, mesmo sendo senhas curtas.
 
 ---
-
-## 📖 Sobre o projeto
-
-O **BiblioSystem** é o back-end (API) de um sistema de gerenciamento de biblioteca. Ele permite que uma instituição controle:
-
-- O **acervo**: livros, autores e categorias (relações N:N entre eles).
-- Os **exemplares físicos** de cada livro (com status "Disponível" / "Emprestado").
-- Os **membros** da biblioteca (leitores que pegam livros emprestados).
-- Os **empréstimos**, com data prevista de devolução e cálculo automático de multa em caso de atraso.
-- As **reservas** de livros que estejam indisponíveis no momento.
-- Os **usuários do sistema** (funcionários e administradores) que acessam a API, com login via e-mail/senha e emissão de token JWT.
-
-O projeto segue uma arquitetura em camadas (**Controller → Service → DbContext**), com DTOs de entrada e saída, tratamento de erros centralizado e paginação genérica e reutilizável para todas as listagens.
-
----
-
 ## 🛠 Tecnologias utilizadas
 
 | Camada | Tecnologia |
